@@ -1800,7 +1800,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <class number="0" name="default" width="0" drill="0">
 </class>
 </classes>
-<designrules name="LaenPCBOrder">
+<designrules name="LaenPCBOrder *">
 <description language="de">&lt;b&gt;EAGLE Design Rules&lt;/b&gt;
 &lt;p&gt;
 Die Standard-Design-Rules sind so gewählt, dass sie für 
@@ -1864,7 +1864,7 @@ Please make sure your boards conform to these design rules.</description>
 <param name="mlMaxStopFrame" value="3mil"/>
 <param name="mlMinCreamFrame" value="0mil"/>
 <param name="mlMaxCreamFrame" value="0mil"/>
-<param name="mlViaStopLimit" value="0mil"/>
+<param name="mlViaStopLimit" value="13mil"/>
 <param name="srRoundness" value="0"/>
 <param name="srMinRoundness" value="0mil"/>
 <param name="srMaxRoundness" value="0mil"/>
@@ -2377,6 +2377,16 @@ Please make sure your boards conform to these design rules.</description>
 <via x="18.415" y="6.6675" extent="1-16" drill="0.6" shape="square"/>
 </signal>
 </signals>
+<errors>
+<approved hash="2,20,9cee7e9c7ae8989a"/>
+<approved hash="2,20,9e0e7c7c78e89a9a"/>
+<approved hash="2,20,3e0b4c7948e93a9b"/>
+<approved hash="2,20,3ceb4e994ae9389b"/>
+<approved hash="5,16,d2a5dfaadfaad2a5"/>
+<approved hash="5,16,c106cd1ced1ce106"/>
+<approved hash="5,16,5aa857ab73ab7ea8"/>
+<approved hash="5,16,43394f076f076339"/>
+</errors>
 </board>
 </drawing>
 <compatibility>
