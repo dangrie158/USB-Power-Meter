@@ -7200,7 +7200,7 @@ Standard schematic elements and footprints for 5mm, 3mm, 1206, and 0603 sized LE
 </classes>
 <parts>
 <part name="INPUT" library="SparkFun-Connectors" deviceset="USB+SHIELD" device="THROUGHHOLE-MALE" value="USB+SHIELDTHROUGHHOLE-MALE"/>
-<part name="R1" library="rcl" deviceset="R-EU_" device="R2512" value="1Ω"/>
+<part name="R1" library="rcl" deviceset="R-EU_" device="R2512" value="0.1Ω"/>
 <part name="GND1" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="P+1" library="supply1" deviceset="+5V" device=""/>
 <part name="ATTINY85" library="SparkFun-DigitalIC" deviceset="ATTINY45" device="TINY85-20-SMT" value="Tiny85-20-SMT"/>
@@ -7240,14 +7240,11 @@ Standard schematic elements and footprints for 5mm, 3mm, 1206, and 0603 sized LE
 <sheets>
 <sheet>
 <plain>
-<text x="15.24" y="71.12" size="1.778" layer="91">using internal 1.1V reference:
-max measured output = 1A
-nearest value = 1ohm: actual max I=1.1A</text>
 <text x="0" y="33.02" size="1.778" layer="91">VSense = 1V @6V Input, 
 VSense max = 6.6V</text>
 <text x="48.26" y="33.02" size="1.778" layer="91">ISense = 1V @6V Input, 
 ISense max = 6.6V
-I @ 1/6V Drop = 1A</text>
+I @ 1/6V Drop = 0.1A</text>
 </plain>
 <instances>
 <instance part="INPUT" gate="G$1" x="10.16" y="55.88" rot="MR0"/>
