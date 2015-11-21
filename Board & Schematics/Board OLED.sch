@@ -7219,10 +7219,6 @@ Standard schematic elements and footprints for 5mm, 3mm, 1206, and 0603 sized LE
 <part name="U$1" library="OwnStuff" deviceset="ICSP" device="SMD" value="ICSPSMD"/>
 <part name="P+5" library="supply1" deviceset="+5V" device=""/>
 <part name="GND6" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="R4" library="rcl" deviceset="R-EU_" device="R0603" value="10kΩ"/>
-<part name="R5" library="rcl" deviceset="R-EU_" device="R0603" value="2kΩ"/>
-<part name="R6" library="rcl" deviceset="R-EU_" device="R0603" value="10kΩ"/>
-<part name="R7" library="rcl" deviceset="R-EU_" device="R0603" value="2kΩ"/>
 <part name="GND8" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="S1" library="SparkFun-Electromechanical" deviceset="SWITCH-SPDT" device="-SMD-A"/>
 <part name="C2" library="rcl" deviceset="C-EU" device="C0603" value="100nF"/>
@@ -7267,10 +7263,6 @@ I @ 1/6V Drop = 0.1A</text>
 <instance part="U$1" gate="G$1" x="104.14" y="58.42"/>
 <instance part="P+5" gate="1" x="91.44" y="71.12"/>
 <instance part="GND6" gate="1" x="91.44" y="48.26"/>
-<instance part="R4" gate="G$1" x="30.48" y="50.8" rot="R90"/>
-<instance part="R5" gate="G$1" x="30.48" y="35.56" rot="R90"/>
-<instance part="R6" gate="G$1" x="40.64" y="50.8" rot="R90"/>
-<instance part="R7" gate="G$1" x="40.64" y="35.56" rot="R90"/>
 <instance part="GND8" gate="1" x="35.56" y="27.94"/>
 <instance part="S1" gate="1" x="22.86" y="55.88"/>
 <instance part="C2" gate="G$1" x="45.72" y="35.56"/>
@@ -7332,18 +7324,12 @@ I @ 1/6V Drop = 0.1A</text>
 <wire x1="91.44" y1="53.34" x2="93.98" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="R5" gate="G$1" pin="1"/>
 <pinref part="GND8" gate="1" pin="GND"/>
-<wire x1="30.48" y1="30.48" x2="35.56" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="35.56" y1="30.48" x2="40.64" y2="30.48" width="0.1524" layer="91"/>
 <junction x="35.56" y="30.48"/>
-<pinref part="R7" gate="G$1" pin="1"/>
 <pinref part="C2" gate="G$1" pin="2"/>
-<wire x1="45.72" y1="30.48" x2="40.64" y2="30.48" width="0.1524" layer="91"/>
-<junction x="40.64" y="30.48"/>
+<wire x1="45.72" y1="30.48" x2="35.56" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="C3" gate="G$1" pin="2"/>
-<wire x1="25.4" y1="30.48" x2="30.48" y2="30.48" width="0.1524" layer="91"/>
-<junction x="30.48" y="30.48"/>
+<wire x1="25.4" y1="30.48" x2="35.56" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="INPUT" gate="G$1" pin="GND"/>
@@ -7421,16 +7407,24 @@ I @ 1/6V Drop = 0.1A</text>
 <segment>
 <pinref part="S1" gate="1" pin="O"/>
 <pinref part="R1" gate="G$1" pin="1"/>
-<pinref part="R4" gate="G$1" pin="2"/>
-<wire x1="30.48" y1="55.88" x2="30.48" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="27.94" y1="58.42" x2="30.48" y2="58.42" width="0.1524" layer="91"/>
 <junction x="30.48" y="58.42"/>
 <pinref part="P+1" gate="1" pin="+5V"/>
 <wire x1="30.48" y1="60.96" x2="30.48" y2="58.42" width="0.1524" layer="91"/>
+<label x="30.48" y="43.18" size="1.778" layer="95" rot="R180" xref="yes"/>
+<pinref part="C3" gate="G$1" pin="1"/>
+<wire x1="30.48" y1="40.64" x2="25.4" y2="40.64" width="0.1524" layer="91"/>
+<wire x1="25.4" y1="40.64" x2="25.4" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="30.48" y1="58.42" x2="30.48" y2="40.64" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="P+6" gate="1" pin="+5V"/>
 <pinref part="PWR" gate="G$1" pin="A"/>
+</segment>
+<segment>
+<pinref part="ATTINY85" gate="G$1" pin="PB3(ADC3)"/>
+<wire x1="35.56" y1="-7.62" x2="38.1" y2="-7.62" width="0.1524" layer="91"/>
+<label x="38.1" y="-7.62" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="RST" class="0">
@@ -7448,18 +7442,6 @@ I @ 1/6V Drop = 0.1A</text>
 <wire x1="88.9" y1="55.88" x2="88.9" y2="50.8" width="0.1524" layer="91"/>
 <wire x1="88.9" y1="50.8" x2="83.82" y2="50.8" width="0.1524" layer="91"/>
 <label x="83.82" y="50.8" size="1.778" layer="95" rot="R180" xref="yes"/>
-</segment>
-</net>
-<net name="N$6" class="0">
-<segment>
-<pinref part="R1" gate="G$1" pin="2"/>
-<pinref part="OUTPUT" gate="G$1" pin="VBUS"/>
-<junction x="40.64" y="58.42"/>
-<pinref part="R6" gate="G$1" pin="2"/>
-<wire x1="40.64" y1="58.42" x2="58.42" y2="58.42" width="0.1524" layer="91"/>
-<wire x1="40.64" y1="55.88" x2="40.64" y2="58.42" width="0.1524" layer="91"/>
-<junction x="40.64" y="58.42"/>
-<pinref part="VO" gate="G$1" pin="TP"/>
 </segment>
 </net>
 <net name="MOSI" class="0">
@@ -7525,33 +7507,21 @@ I @ 1/6V Drop = 0.1A</text>
 <junction x="60.96" y="0"/>
 </segment>
 </net>
-<net name="VSENSE" class="0">
-<segment>
-<pinref part="ATTINY85" gate="G$1" pin="PB3(ADC3)"/>
-<wire x1="35.56" y1="-7.62" x2="38.1" y2="-7.62" width="0.1524" layer="91"/>
-<label x="38.1" y="-7.62" size="1.778" layer="95" xref="yes"/>
-</segment>
-<segment>
-<pinref part="R4" gate="G$1" pin="1"/>
-<pinref part="R5" gate="G$1" pin="2"/>
-<wire x1="30.48" y1="45.72" x2="30.48" y2="40.64" width="0.1524" layer="91"/>
-<label x="30.48" y="43.18" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="C3" gate="G$1" pin="1"/>
-<wire x1="30.48" y1="40.64" x2="25.4" y2="40.64" width="0.1524" layer="91"/>
-<wire x1="25.4" y1="40.64" x2="25.4" y2="38.1" width="0.1524" layer="91"/>
-<junction x="30.48" y="40.64"/>
-</segment>
-</net>
 <net name="ISENSE" class="0">
 <segment>
-<pinref part="R6" gate="G$1" pin="1"/>
-<pinref part="R7" gate="G$1" pin="2"/>
-<wire x1="40.64" y1="45.72" x2="40.64" y2="40.64" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="45.72" x2="40.64" y2="43.18" width="0.1524" layer="91"/>
 <label x="40.64" y="43.18" size="1.778" layer="95" xref="yes"/>
 <pinref part="C2" gate="G$1" pin="1"/>
+<wire x1="40.64" y1="43.18" x2="40.64" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="40.64" y1="40.64" x2="45.72" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="45.72" y1="40.64" x2="45.72" y2="38.1" width="0.1524" layer="91"/>
-<junction x="40.64" y="40.64"/>
+<pinref part="R1" gate="G$1" pin="2"/>
+<pinref part="OUTPUT" gate="G$1" pin="VBUS"/>
+<junction x="40.64" y="58.42"/>
+<wire x1="40.64" y1="58.42" x2="58.42" y2="58.42" width="0.1524" layer="91"/>
+<junction x="40.64" y="58.42"/>
+<pinref part="VO" gate="G$1" pin="TP"/>
+<wire x1="40.64" y1="58.42" x2="40.64" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="ATTINY85" gate="G$1" pin="PB4(ADC2)"/>
