@@ -7232,6 +7232,7 @@ Standard schematic elements and footprints for 5mm, 3mm, 1206, and 0603 sized LE
 <part name="GND7" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="PWR" library="SparkFun-LED" deviceset="LED" device="0603"/>
 <part name="R10" library="rcl" deviceset="R-EU_" device="R0603" value="91Ω"/>
+<part name="GND" library="OwnStuff" deviceset="TESTPOINT" device="0.5MM-DRILL-WIRE-LOOP"/>
 </parts>
 <sheets>
 <sheet>
@@ -7276,6 +7277,7 @@ I @ 1/6V Drop = 0.1A</text>
 <instance part="GND7" gate="1" x="116.84" y="-17.78"/>
 <instance part="PWR" gate="G$1" x="116.84" y="0"/>
 <instance part="R10" gate="G$1" x="116.84" y="-10.16" rot="R90"/>
+<instance part="GND" gate="G$1" x="17.78" y="50.8"/>
 </instances>
 <busses>
 </busses>
@@ -7344,6 +7346,7 @@ I @ 1/6V Drop = 0.1A</text>
 <pinref part="GND1" gate="1" pin="GND"/>
 <wire x1="5.08" y1="50.8" x2="5.08" y2="48.26" width="0.1524" layer="91"/>
 <junction x="5.08" y="50.8"/>
+<pinref part="GND" gate="G$1" pin="TP"/>
 </segment>
 <segment>
 <pinref part="MODE" gate="G$1" pin="P"/>
@@ -7422,9 +7425,9 @@ I @ 1/6V Drop = 0.1A</text>
 <pinref part="PWR" gate="G$1" pin="A"/>
 </segment>
 <segment>
-<pinref part="ATTINY85" gate="G$1" pin="PB3(ADC3)"/>
-<wire x1="35.56" y1="-7.62" x2="38.1" y2="-7.62" width="0.1524" layer="91"/>
-<label x="38.1" y="-7.62" size="1.778" layer="95" xref="yes"/>
+<pinref part="ATTINY85" gate="G$1" pin="PB4(ADC2)"/>
+<wire x1="38.1" y1="-10.16" x2="35.56" y2="-10.16" width="0.1524" layer="91"/>
+<label x="38.1" y="-10.16" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="RST" class="0">
@@ -7524,9 +7527,9 @@ I @ 1/6V Drop = 0.1A</text>
 <wire x1="40.64" y1="58.42" x2="40.64" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="ATTINY85" gate="G$1" pin="PB4(ADC2)"/>
-<wire x1="38.1" y1="-10.16" x2="35.56" y2="-10.16" width="0.1524" layer="91"/>
-<label x="38.1" y="-10.16" size="1.778" layer="95" xref="yes"/>
+<pinref part="ATTINY85" gate="G$1" pin="PB3(ADC3)"/>
+<wire x1="35.56" y1="-7.62" x2="38.1" y2="-7.62" width="0.1524" layer="91"/>
+<label x="38.1" y="-7.62" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="N$3" class="0">
