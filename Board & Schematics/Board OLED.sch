@@ -7213,7 +7213,6 @@ Standard schematic elements and footprints for 5mm, 3mm, 1206, and 0603 sized LE
 <part name="P+3" library="supply1" deviceset="+5V" device=""/>
 <part name="GND4" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="MODE" library="OwnStuff" deviceset="SPST" device="" value="SPST"/>
-<part name="GND5" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="P+4" library="supply1" deviceset="+5V" device=""/>
 <part name="R3" library="rcl" deviceset="R-EU_" device="R0603" value="10kΩ"/>
 <part name="U$1" library="OwnStuff" deviceset="ICSP" device="SMD" value="ICSPSMD"/>
@@ -7233,6 +7232,8 @@ Standard schematic elements and footprints for 5mm, 3mm, 1206, and 0603 sized LE
 <part name="PWR" library="SparkFun-LED" deviceset="LED" device="0603"/>
 <part name="R10" library="rcl" deviceset="R-EU_" device="R0603" value="91Ω"/>
 <part name="GND" library="OwnStuff" deviceset="TESTPOINT" device="0.5MM-DRILL-WIRE-LOOP"/>
+<part name="R4" library="rcl" deviceset="R-EU_" device="R0603" value="2kΩ"/>
+<part name="GND5" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -7255,12 +7256,11 @@ I @ 1/6V Drop = 0.1A</text>
 <instance part="R2" gate="G$1" x="20.32" y="-25.4"/>
 <instance part="OUTPUT" gate="G$1" x="60.96" y="55.88"/>
 <instance part="GND3" gate="1" x="66.04" y="45.72"/>
-<instance part="P+3" gate="1" x="81.28" y="20.32"/>
+<instance part="P+3" gate="1" x="71.12" y="20.32"/>
 <instance part="GND4" gate="1" x="81.28" y="-12.7"/>
-<instance part="MODE" gate="G$1" x="68.58" y="0" rot="MR0"/>
-<instance part="GND5" gate="1" x="73.66" y="-5.08"/>
-<instance part="P+4" gate="1" x="60.96" y="12.7"/>
-<instance part="R3" gate="G$1" x="60.96" y="5.08" rot="R90"/>
+<instance part="MODE" gate="G$1" x="73.66" y="-22.86" rot="MR90"/>
+<instance part="P+4" gate="1" x="55.88" y="-12.7"/>
+<instance part="R3" gate="G$1" x="60.96" y="-17.78" rot="R180"/>
 <instance part="U$1" gate="G$1" x="104.14" y="58.42"/>
 <instance part="P+5" gate="1" x="91.44" y="71.12"/>
 <instance part="GND6" gate="1" x="91.44" y="48.26"/>
@@ -7269,8 +7269,8 @@ I @ 1/6V Drop = 0.1A</text>
 <instance part="C2" gate="G$1" x="45.72" y="35.56"/>
 <instance part="C3" gate="G$1" x="25.4" y="35.56"/>
 <instance part="U$2" gate="G$1" x="96.52" y="0"/>
-<instance part="R8" gate="G$1" x="83.82" y="7.62" rot="R90"/>
-<instance part="R9" gate="G$1" x="86.36" y="2.54" rot="R90"/>
+<instance part="R8" gate="G$1" x="66.04" y="7.62" rot="R90"/>
+<instance part="R9" gate="G$1" x="76.2" y="2.54" rot="R90"/>
 <instance part="VI" gate="G$1" x="20.32" y="58.42"/>
 <instance part="VO" gate="G$1" x="40.64" y="58.42"/>
 <instance part="P+6" gate="1" x="116.84" y="5.08"/>
@@ -7278,6 +7278,8 @@ I @ 1/6V Drop = 0.1A</text>
 <instance part="PWR" gate="G$1" x="116.84" y="0"/>
 <instance part="R10" gate="G$1" x="116.84" y="-10.16" rot="R90"/>
 <instance part="GND" gate="G$1" x="17.78" y="50.8"/>
+<instance part="R4" gate="G$1" x="66.04" y="-22.86" rot="R270"/>
+<instance part="GND5" gate="1" x="66.04" y="-33.02"/>
 </instances>
 <busses>
 </busses>
@@ -7349,11 +7351,6 @@ I @ 1/6V Drop = 0.1A</text>
 <pinref part="GND" gate="G$1" pin="TP"/>
 </segment>
 <segment>
-<pinref part="MODE" gate="G$1" pin="P"/>
-<pinref part="GND5" gate="1" pin="GND"/>
-<wire x1="73.66" y1="0" x2="73.66" y2="-2.54" width="0.1524" layer="91"/>
-</segment>
-<segment>
 <pinref part="OUTPUT" gate="G$1" pin="GND"/>
 <wire x1="58.42" y1="50.8" x2="58.42" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="OUTPUT" gate="G$1" pin="S1"/>
@@ -7368,6 +7365,14 @@ I @ 1/6V Drop = 0.1A</text>
 <segment>
 <pinref part="R10" gate="G$1" pin="1"/>
 <pinref part="GND7" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="R4" gate="G$1" pin="2"/>
+<pinref part="GND5" gate="1" pin="GND"/>
+<wire x1="66.04" y1="-30.48" x2="66.04" y2="-27.94" width="0.1524" layer="91"/>
+<pinref part="MODE" gate="G$1" pin="P"/>
+<wire x1="73.66" y1="-27.94" x2="66.04" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="66.04" y="-27.94"/>
 </segment>
 </net>
 <net name="+5V" class="0">
@@ -7387,25 +7392,21 @@ I @ 1/6V Drop = 0.1A</text>
 <segment>
 <pinref part="P+3" gate="1" pin="+5V"/>
 <pinref part="U$2" gate="G$1" pin="VCC"/>
-<wire x1="81.28" y1="12.7" x2="81.28" y2="17.78" width="0.1524" layer="91"/>
-<wire x1="88.9" y1="7.62" x2="86.36" y2="7.62" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="12.7" x2="71.12" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="88.9" y1="7.62" x2="76.2" y2="7.62" width="0.1524" layer="91"/>
 <pinref part="R9" gate="G$1" pin="2"/>
-<wire x1="86.36" y1="7.62" x2="86.36" y2="12.7" width="0.1524" layer="91"/>
-<junction x="86.36" y="7.62"/>
+<wire x1="76.2" y1="7.62" x2="76.2" y2="12.7" width="0.1524" layer="91"/>
+<junction x="76.2" y="7.62"/>
 <pinref part="R8" gate="G$1" pin="2"/>
-<wire x1="86.36" y1="12.7" x2="83.82" y2="12.7" width="0.1524" layer="91"/>
-<wire x1="83.82" y1="12.7" x2="81.28" y2="12.7" width="0.1524" layer="91"/>
-<junction x="83.82" y="12.7"/>
+<wire x1="66.04" y1="12.7" x2="71.12" y2="12.7" width="0.1524" layer="91"/>
+<junction x="66.04" y="12.7"/>
+<wire x1="76.2" y1="12.7" x2="71.12" y2="12.7" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="5V"/>
 <pinref part="P+5" gate="1" pin="+5V"/>
 <wire x1="93.98" y1="66.04" x2="91.44" y2="66.04" width="0.1524" layer="91"/>
 <wire x1="91.44" y1="66.04" x2="91.44" y2="68.58" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="R3" gate="G$1" pin="2"/>
-<pinref part="P+4" gate="1" pin="+5V"/>
 </segment>
 <segment>
 <pinref part="S1" gate="1" pin="O"/>
@@ -7429,6 +7430,11 @@ I @ 1/6V Drop = 0.1A</text>
 <wire x1="38.1" y1="-10.16" x2="35.56" y2="-10.16" width="0.1524" layer="91"/>
 <label x="38.1" y="-10.16" size="1.778" layer="95" xref="yes"/>
 </segment>
+<segment>
+<pinref part="R3" gate="G$1" pin="2"/>
+<pinref part="P+4" gate="1" pin="+5V"/>
+<wire x1="55.88" y1="-17.78" x2="55.88" y2="-15.24" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="RST" class="0">
 <segment>
@@ -7449,44 +7455,38 @@ I @ 1/6V Drop = 0.1A</text>
 </net>
 <net name="MOSI" class="0">
 <segment>
-<pinref part="ATTINY85" gate="G$1" pin="PB0(MOSI)"/>
-<wire x1="48.26" y1="0" x2="35.56" y2="0" width="0.1524" layer="91"/>
-<wire x1="48.26" y1="0" x2="48.26" y2="15.24" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="-2.54" x2="76.2" y2="15.24" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="15.24" x2="48.26" y2="15.24" width="0.1524" layer="91"/>
-<label x="50.8" y="15.24" size="1.778" layer="95" rot="R90" xref="yes"/>
-<pinref part="U$2" gate="G$1" pin="SDA"/>
-<wire x1="86.36" y1="-2.54" x2="88.9" y2="-2.54" width="0.1524" layer="91"/>
-<pinref part="R9" gate="G$1" pin="1"/>
-<wire x1="76.2" y1="-2.54" x2="86.36" y2="-2.54" width="0.1524" layer="91"/>
-<junction x="86.36" y="-2.54"/>
-</segment>
-<segment>
 <pinref part="U$1" gate="G$1" pin="MOSI"/>
 <wire x1="93.98" y1="60.96" x2="83.82" y2="60.96" width="0.1524" layer="91"/>
 <label x="83.82" y="60.96" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
+<segment>
+<pinref part="U$2" gate="G$1" pin="SCL"/>
+<wire x1="88.9" y1="2.54" x2="66.04" y2="2.54" width="0.1524" layer="91"/>
+<pinref part="R8" gate="G$1" pin="1"/>
+<junction x="66.04" y="2.54"/>
+<pinref part="ATTINY85" gate="G$1" pin="PB0(MOSI)"/>
+<wire x1="66.04" y1="2.54" x2="35.56" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="2.54" x2="35.56" y2="0" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="SCK" class="0">
-<segment>
-<wire x1="58.42" y1="-10.16" x2="78.74" y2="-10.16" width="0.1524" layer="91"/>
-<wire x1="78.74" y1="-10.16" x2="78.74" y2="2.54" width="0.1524" layer="91"/>
-<label x="58.42" y="-7.62" size="1.778" layer="95" xref="yes"/>
-<pinref part="ATTINY85" gate="G$1" pin="PB2(SCK/ADC1)"/>
-<wire x1="35.56" y1="-5.08" x2="58.42" y2="-5.08" width="0.1524" layer="91"/>
-<wire x1="58.42" y1="-10.16" x2="58.42" y2="-5.08" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="SCL"/>
-<wire x1="88.9" y1="2.54" x2="83.82" y2="2.54" width="0.1524" layer="91"/>
-<pinref part="R8" gate="G$1" pin="1"/>
-<wire x1="78.74" y1="2.54" x2="83.82" y2="2.54" width="0.1524" layer="91"/>
-<junction x="83.82" y="2.54"/>
-</segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="SCK"/>
 <wire x1="93.98" y1="58.42" x2="86.36" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="86.36" y1="58.42" x2="86.36" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="86.36" y1="55.88" x2="83.82" y2="55.88" width="0.1524" layer="91"/>
 <label x="83.82" y="55.88" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="R3" gate="G$1" pin="1"/>
+<pinref part="MODE" gate="G$1" pin="O"/>
+<wire x1="66.04" y1="-17.78" x2="73.66" y2="-17.78" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="-17.78" x2="73.66" y2="-5.08" width="0.1524" layer="91"/>
+<junction x="73.66" y="-17.78"/>
+<pinref part="ATTINY85" gate="G$1" pin="PB2(SCK/ADC1)"/>
+<wire x1="73.66" y1="-5.08" x2="35.56" y2="-5.08" width="0.1524" layer="91"/>
+<pinref part="R4" gate="G$1" pin="1"/>
+<junction x="66.04" y="-17.78"/>
 </segment>
 </net>
 <net name="MISO" class="0">
@@ -7499,15 +7499,12 @@ I @ 1/6V Drop = 0.1A</text>
 <label x="83.82" y="66.04" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
+<wire x1="76.2" y1="-2.54" x2="35.56" y2="-2.54" width="0.1524" layer="91"/>
+<pinref part="U$2" gate="G$1" pin="SDA"/>
+<wire x1="76.2" y1="-2.54" x2="88.9" y2="-2.54" width="0.1524" layer="91"/>
+<pinref part="R9" gate="G$1" pin="1"/>
+<junction x="76.2" y="-2.54"/>
 <pinref part="ATTINY85" gate="G$1" pin="PB1(MISO)"/>
-<wire x1="55.88" y1="0" x2="55.88" y2="-2.54" width="0.1524" layer="91"/>
-<wire x1="55.88" y1="-2.54" x2="35.56" y2="-2.54" width="0.1524" layer="91"/>
-<label x="50.8" y="-2.54" size="1.778" layer="95" rot="R90" xref="yes"/>
-<pinref part="R3" gate="G$1" pin="1"/>
-<wire x1="55.88" y1="0" x2="60.96" y2="0" width="0.1524" layer="91"/>
-<pinref part="MODE" gate="G$1" pin="O"/>
-<wire x1="60.96" y1="0" x2="63.5" y2="0" width="0.1524" layer="91"/>
-<junction x="60.96" y="0"/>
 </segment>
 </net>
 <net name="ISENSE" class="0">
