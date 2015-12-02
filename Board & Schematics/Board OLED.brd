@@ -2015,7 +2015,7 @@ Please make sure your boards conform to these design rules.</description>
 <attribute name="NAME" x="14.525625" y="1.0875" size="0.6096" layer="21" align="top-center"/>
 </element>
 <element name="R4" library="rcl" package="R0603" value="2kΩ" x="19.685" y="23.495" smashed="yes" rot="R180">
-<attribute name="NAME" x="20.6375" y="22.70125" size="0.6096" layer="25" align="top-center"/>
+<attribute name="NAME" x="20.6375" y="22.86" size="0.6096" layer="25" align="top-center"/>
 <attribute name="VALUE" x="20.32" y="25.4" size="1.27" layer="27" rot="R180"/>
 </element>
 </elements>
