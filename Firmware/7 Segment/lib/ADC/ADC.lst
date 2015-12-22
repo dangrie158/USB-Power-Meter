@@ -1,0 +1,314 @@
+   1               		.file	"ADC.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	AdcSetDifferentialInputMode
+  12               	AdcSetDifferentialInputMode:
+  13               	.LFB1:
+  14               		.file 1 "lib/ADC/ADC.c"
+   1:lib/ADC/ADC.c **** #include <avr/io.h>
+   2:lib/ADC/ADC.c **** 
+   3:lib/ADC/ADC.c **** #include "adc.h"
+   4:lib/ADC/ADC.c **** 
+   5:lib/ADC/ADC.c **** void AdcInit(){
+   6:lib/ADC/ADC.c **** 
+   7:lib/ADC/ADC.c **** 	//DDRB are inputs
+   8:lib/ADC/ADC.c **** 	DDRB &= ~(1 << PB3);
+   9:lib/ADC/ADC.c **** 	DDRB &= ~(1 << PB4);
+  10:lib/ADC/ADC.c **** 
+  11:lib/ADC/ADC.c **** 	//Select internal Voltage Reference (1.1V)
+  12:lib/ADC/ADC.c **** 	ADMUX &= ~(1 << REFS2);
+  13:lib/ADC/ADC.c **** 	ADMUX |= (1 << REFS1);
+  14:lib/ADC/ADC.c **** 	ADMUX &= ~(1 << REFS0);
+  15:lib/ADC/ADC.c **** 
+  16:lib/ADC/ADC.c **** 	//Enable the ADC
+  17:lib/ADC/ADC.c **** 	ADCSRA |= (1 << ADEN);
+  18:lib/ADC/ADC.c **** 
+  19:lib/ADC/ADC.c **** 	//disable the input buffers for ADC2 and ADC3
+  20:lib/ADC/ADC.c **** 	DIDR0 |= (1 << ADC2D);
+  21:lib/ADC/ADC.c **** 	DIDR0 |= (1 << ADC3D);
+  22:lib/ADC/ADC.c **** 
+  23:lib/ADC/ADC.c **** 	//Get a dummy sample from the ADC and theow it away
+  24:lib/ADC/ADC.c **** 	//just to warm up the ADC and make sure its ready
+  25:lib/ADC/ADC.c **** 	AdcGetSample();
+  26:lib/ADC/ADC.c **** }
+  27:lib/ADC/ADC.c **** 
+  28:lib/ADC/ADC.c **** void AdcSetDifferentialInputMode(bool gainEnabled){
+  15               		.loc 1 28 0
+  16               		.cfi_startproc
+  17               	.LVL0:
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  29:lib/ADC/ADC.c **** 	//Positive input ADC2, negative input ADC3
+  30:lib/ADC/ADC.c **** 	ADMUX &= ~(1 << MUX3);
+  22               		.loc 1 30 0
+  23 0000 3B98      		cbi 0x7,3
+  31:lib/ADC/ADC.c **** 	ADMUX |= (1 << MUX2);
+  24               		.loc 1 31 0
+  25 0002 3A9A      		sbi 0x7,2
+  32:lib/ADC/ADC.c **** 	ADMUX |= (1 << MUX1);
+  26               		.loc 1 32 0
+  27 0004 399A      		sbi 0x7,1
+  33:lib/ADC/ADC.c **** 
+  34:lib/ADC/ADC.c **** 	if(gainEnabled){
+  28               		.loc 1 34 0
+  29 0006 8823      		tst r24
+  30 0008 01F0      		breq .L2
+  35:lib/ADC/ADC.c **** 		//Gain x20 enabled
+  36:lib/ADC/ADC.c **** 		ADMUX |= (1 << MUX0);
+  31               		.loc 1 36 0
+  32 000a 389A      		sbi 0x7,0
+  33 000c 00C0      		rjmp .L3
+  34               	.L2:
+  37:lib/ADC/ADC.c **** 	}else{
+  38:lib/ADC/ADC.c **** 		//Gain x1
+  39:lib/ADC/ADC.c **** 		ADMUX &= ~(1 << MUX0);
+  35               		.loc 1 39 0
+  36 000e 3898      		cbi 0x7,0
+  37               	.L3:
+  40:lib/ADC/ADC.c **** 	}
+  41:lib/ADC/ADC.c **** 
+  42:lib/ADC/ADC.c **** 	//On the board, negative and positive inputs are flipped
+  43:lib/ADC/ADC.c **** 	//this is a board design failure, but we can reverse the polarity
+  44:lib/ADC/ADC.c **** 	//by setting the IPR bit
+  45:lib/ADC/ADC.c **** 	ADCSRB |= (1 << IPR);
+  38               		.loc 1 45 0
+  39 0010 1D9A      		sbi 0x3,5
+  40 0012 0895      		ret
+  41               		.cfi_endproc
+  42               	.LFE1:
+  44               	.global	AdcSetSingleEndedMode
+  46               	AdcSetSingleEndedMode:
+  47               	.LFB2:
+  46:lib/ADC/ADC.c **** }
+  47:lib/ADC/ADC.c **** 
+  48:lib/ADC/ADC.c **** void AdcSetSingleEndedMode(uint8_t inputPin){
+  48               		.loc 1 48 0
+  49               		.cfi_startproc
+  50               	.LVL1:
+  51               	/* prologue: function */
+  52               	/* frame size = 0 */
+  53               	/* stack size = 0 */
+  54               	.L__stack_usage = 0
+  49:lib/ADC/ADC.c **** 	//save the old mux value
+  50:lib/ADC/ADC.c **** 	uint8_t oldMux = ADMUX;
+  55               		.loc 1 50 0
+  56 0014 97B1      		in r25,0x7
+  57               	.LVL2:
+  51:lib/ADC/ADC.c **** 	//clear the old channel select
+  52:lib/ADC/ADC.c **** 	oldMux &= ~(0xF);
+  53:lib/ADC/ADC.c **** 	//set the bifs for the input selection
+  54:lib/ADC/ADC.c **** 	oldMux |= inputPin & 0xF;
+  58               		.loc 1 54 0
+  59 0016 8F70      		andi r24,lo8(15)
+  60               	.LVL3:
+  52:lib/ADC/ADC.c **** 	//set the bifs for the input selection
+  61               		.loc 1 52 0
+  62 0018 907F      		andi r25,lo8(-16)
+  63               	.LVL4:
+  64               		.loc 1 54 0
+  65 001a 892B      		or r24,r25
+  66               	.LVL5:
+  55:lib/ADC/ADC.c **** 	//write back the new value
+  56:lib/ADC/ADC.c **** 	ADMUX = oldMux;
+  67               		.loc 1 56 0
+  68 001c 87B9      		out 0x7,r24
+  69 001e 0895      		ret
+  70               		.cfi_endproc
+  71               	.LFE2:
+  73               	.global	AdcGetSample
+  75               	AdcGetSample:
+  76               	.LFB3:
+  57:lib/ADC/ADC.c **** }
+  58:lib/ADC/ADC.c **** 
+  59:lib/ADC/ADC.c **** uint16_t AdcGetSample(){
+  77               		.loc 1 59 0
+  78               		.cfi_startproc
+  79               	/* prologue: function */
+  80               	/* frame size = 0 */
+  81               	/* stack size = 0 */
+  82               	.L__stack_usage = 0
+  60:lib/ADC/ADC.c **** 	//Start a conversion
+  61:lib/ADC/ADC.c **** 	ADCSRA |= (1 << ADSC);
+  83               		.loc 1 61 0
+  84 0020 369A      		sbi 0x6,6
+  85               	.L7:
+  62:lib/ADC/ADC.c **** 
+  63:lib/ADC/ADC.c **** 	//wait until the conversion is finished
+  64:lib/ADC/ADC.c **** 	while(ADCSRA & (1 << ADSC)){};
+  86               		.loc 1 64 0 discriminator 1
+  87 0022 3699      		sbic 0x6,6
+  88 0024 00C0      		rjmp .L7
+  65:lib/ADC/ADC.c **** 
+  66:lib/ADC/ADC.c **** 	return ADC;
+  89               		.loc 1 66 0
+  90 0026 84B1      		in r24,0x4
+  91 0028 95B1      		in r25,0x4+1
+  67:lib/ADC/ADC.c **** }
+  92               		.loc 1 67 0
+  93 002a 0895      		ret
+  94               		.cfi_endproc
+  95               	.LFE3:
+  97               	.global	AdcInit
+  99               	AdcInit:
+ 100               	.LFB0:
+   5:lib/ADC/ADC.c **** 	//DDRB are inputs
+ 101               		.loc 1 5 0
+ 102               		.cfi_startproc
+ 103               	/* prologue: function */
+ 104               	/* frame size = 0 */
+ 105               	/* stack size = 0 */
+ 106               	.L__stack_usage = 0
+   8:lib/ADC/ADC.c **** 	DDRB &= ~(1 << PB4);
+ 107               		.loc 1 8 0
+ 108 002c BB98      		cbi 0x17,3
+   9:lib/ADC/ADC.c **** 
+ 109               		.loc 1 9 0
+ 110 002e BC98      		cbi 0x17,4
+  12:lib/ADC/ADC.c **** 	ADMUX |= (1 << REFS1);
+ 111               		.loc 1 12 0
+ 112 0030 3C98      		cbi 0x7,4
+  13:lib/ADC/ADC.c **** 	ADMUX &= ~(1 << REFS0);
+ 113               		.loc 1 13 0
+ 114 0032 3F9A      		sbi 0x7,7
+  14:lib/ADC/ADC.c **** 
+ 115               		.loc 1 14 0
+ 116 0034 3E98      		cbi 0x7,6
+  17:lib/ADC/ADC.c **** 
+ 117               		.loc 1 17 0
+ 118 0036 379A      		sbi 0x6,7
+  20:lib/ADC/ADC.c **** 	DIDR0 |= (1 << ADC3D);
+ 119               		.loc 1 20 0
+ 120 0038 A49A      		sbi 0x14,4
+  21:lib/ADC/ADC.c **** 
+ 121               		.loc 1 21 0
+ 122 003a A39A      		sbi 0x14,3
+  25:lib/ADC/ADC.c **** }
+ 123               		.loc 1 25 0
+ 124 003c 00C0      		rjmp AdcGetSample
+ 125               	.LVL6:
+ 126               		.cfi_endproc
+ 127               	.LFE0:
+ 129               	.global	AdcGetMultiSample
+ 131               	AdcGetMultiSample:
+ 132               	.LFB4:
+  68:lib/ADC/ADC.c **** 
+  69:lib/ADC/ADC.c **** uint16_t AdcGetMultiSample(uint8_t numSamples){
+ 133               		.loc 1 69 0
+ 134               		.cfi_startproc
+ 135               	.LVL7:
+ 136 003e CF92      		push r12
+ 137               	.LCFI0:
+ 138               		.cfi_def_cfa_offset 3
+ 139               		.cfi_offset 12, -2
+ 140 0040 DF92      		push r13
+ 141               	.LCFI1:
+ 142               		.cfi_def_cfa_offset 4
+ 143               		.cfi_offset 13, -3
+ 144 0042 EF92      		push r14
+ 145               	.LCFI2:
+ 146               		.cfi_def_cfa_offset 5
+ 147               		.cfi_offset 14, -4
+ 148 0044 FF92      		push r15
+ 149               	.LCFI3:
+ 150               		.cfi_def_cfa_offset 6
+ 151               		.cfi_offset 15, -5
+ 152 0046 CF93      		push r28
+ 153               	.LCFI4:
+ 154               		.cfi_def_cfa_offset 7
+ 155               		.cfi_offset 28, -6
+ 156 0048 DF93      		push r29
+ 157               	.LCFI5:
+ 158               		.cfi_def_cfa_offset 8
+ 159               		.cfi_offset 29, -7
+ 160               	/* prologue: function */
+ 161               	/* frame size = 0 */
+ 162               	/* stack size = 6 */
+ 163               	.L__stack_usage = 6
+ 164 004a C82F      		mov r28,r24
+ 165               	.LVL8:
+ 166               	.LBB2:
+  70:lib/ADC/ADC.c **** 	uint32_t sum = 0;
+  71:lib/ADC/ADC.c **** 
+  72:lib/ADC/ADC.c **** 	for (uint8_t i = 0; i < numSamples; ++i ) {
+ 167               		.loc 1 72 0
+ 168 004c D0E0      		ldi r29,0
+ 169               	.LBE2:
+  70:lib/ADC/ADC.c **** 	uint32_t sum = 0;
+ 170               		.loc 1 70 0
+ 171 004e C12C      		mov r12,__zero_reg__
+ 172 0050 D12C      		mov r13,__zero_reg__
+ 173 0052 7601      		movw r14,r12
+ 174               	.LVL9:
+ 175               	.L11:
+ 176               	.LBB3:
+ 177               		.loc 1 72 0 discriminator 1
+ 178 0054 DC17      		cp r29,r28
+ 179 0056 01F0      		breq .L13
+  73:lib/ADC/ADC.c ****     	sum += AdcGetSample();
+ 180               		.loc 1 73 0 discriminator 3
+ 181 0058 00D0      		rcall AdcGetSample
+ 182               	.LVL10:
+ 183 005a C80E      		add r12,r24
+ 184 005c D91E      		adc r13,r25
+ 185 005e E11C      		adc r14,__zero_reg__
+ 186 0060 F11C      		adc r15,__zero_reg__
+ 187               	.LVL11:
+  72:lib/ADC/ADC.c ****     	sum += AdcGetSample();
+ 188               		.loc 1 72 0 discriminator 3
+ 189 0062 DF5F      		subi r29,lo8(-(1))
+ 190               	.LVL12:
+ 191 0064 00C0      		rjmp .L11
+ 192               	.L13:
+ 193               	.LBE3:
+  74:lib/ADC/ADC.c ****   	}
+  75:lib/ADC/ADC.c **** 
+  76:lib/ADC/ADC.c **** 	return (uint16_t)( sum / numSamples );
+ 194               		.loc 1 76 0
+ 195 0066 2D2F      		mov r18,r29
+ 196 0068 30E0      		ldi r19,0
+ 197 006a 40E0      		ldi r20,0
+ 198 006c 50E0      		ldi r21,0
+ 199 006e C701      		movw r24,r14
+ 200 0070 B601      		movw r22,r12
+ 201 0072 00D0      		rcall __udivmodsi4
+  77:lib/ADC/ADC.c **** }
+ 202               		.loc 1 77 0
+ 203 0074 C901      		movw r24,r18
+ 204               	/* epilogue start */
+ 205 0076 DF91      		pop r29
+ 206               	.LVL13:
+ 207 0078 CF91      		pop r28
+ 208               	.LVL14:
+ 209 007a FF90      		pop r15
+ 210 007c EF90      		pop r14
+ 211 007e DF90      		pop r13
+ 212 0080 CF90      		pop r12
+ 213               	.LVL15:
+ 214 0082 0895      		ret
+ 215               		.cfi_endproc
+ 216               	.LFE4:
+ 218               	.Letext0:
+ 219               		.file 2 "/usr/local/Cellar/avr-gcc/4.9.2/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 ADC.c
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:5      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:6      *ABS*:0000000000000001 __zero_reg__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:12     .text:0000000000000000 AdcSetDifferentialInputMode
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:46     .text:0000000000000014 AdcSetSingleEndedMode
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:75     .text:0000000000000020 AdcGetSample
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:99     .text:000000000000002c AdcInit
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cc3Po69y.s:131    .text:000000000000003e AdcGetMultiSample
+
+UNDEFINED SYMBOLS
+__udivmodsi4

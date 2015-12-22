@@ -1,0 +1,1743 @@
+   1               		.file	"ssd1306xled.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	ssd1306_xfer_start
+  12               	ssd1306_xfer_start:
+  13               	.LFB5:
+  14               		.file 1 "lib/ssd1306xled/ssd1306xled.c"
+   1:lib/ssd1306xled/ssd1306xled.c **** /*
+   2:lib/ssd1306xled/ssd1306xled.c ****  * SSD1306xLED - Drivers for SSD1306 controlled dot matrix OLED/PLED 128x64 displays
+   3:lib/ssd1306xled/ssd1306xled.c ****  *
+   4:lib/ssd1306xled/ssd1306xled.c ****  * @created: 2014-08-12
+   5:lib/ssd1306xled/ssd1306xled.c ****  * @author: Neven Boyanov
+   6:lib/ssd1306xled/ssd1306xled.c ****  *
+   7:lib/ssd1306xled/ssd1306xled.c ****  * Copyright (c) 2015 Neven Boyanov, Tinusaur Team. All Rights Reserved.
+   8:lib/ssd1306xled/ssd1306xled.c ****  * Distributed as open source software under MIT License, see LICENSE.txt file.
+   9:lib/ssd1306xled/ssd1306xled.c ****  * Please, as a favour, retain the link http://tinusaur.org to The Tinusaur Project.
+  10:lib/ssd1306xled/ssd1306xled.c ****  *
+  11:lib/ssd1306xled/ssd1306xled.c ****  * Source code available at: https://bitbucket.org/tinusaur/ssd1306xled
+  12:lib/ssd1306xled/ssd1306xled.c ****  *
+  13:lib/ssd1306xled/ssd1306xled.c ****  */
+  14:lib/ssd1306xled/ssd1306xled.c **** 
+  15:lib/ssd1306xled/ssd1306xled.c **** // ----------------------------------------------------------------------------
+  16:lib/ssd1306xled/ssd1306xled.c **** 
+  17:lib/ssd1306xled/ssd1306xled.c **** #include <stdlib.h>
+  18:lib/ssd1306xled/ssd1306xled.c **** #include <avr/io.h>
+  19:lib/ssd1306xled/ssd1306xled.c **** 
+  20:lib/ssd1306xled/ssd1306xled.c **** #include <avr/pgmspace.h>
+  21:lib/ssd1306xled/ssd1306xled.c **** 
+  22:lib/ssd1306xled/ssd1306xled.c **** #include "ssd1306xled.h"
+  23:lib/ssd1306xled/ssd1306xled.c **** #include "font6x8.h"
+  24:lib/ssd1306xled/ssd1306xled.c **** 
+  25:lib/ssd1306xled/ssd1306xled.c **** #include "num2str.h"
+  26:lib/ssd1306xled/ssd1306xled.c **** 
+  27:lib/ssd1306xled/ssd1306xled.c **** // ----------------------------------------------------------------------------
+  28:lib/ssd1306xled/ssd1306xled.c **** 
+  29:lib/ssd1306xled/ssd1306xled.c **** // Convenience definitions for PORTB
+  30:lib/ssd1306xled/ssd1306xled.c **** 
+  31:lib/ssd1306xled/ssd1306xled.c **** #define DIGITAL_WRITE_HIGH(PORT) PORTB |= (1 << PORT)
+  32:lib/ssd1306xled/ssd1306xled.c **** #define DIGITAL_WRITE_LOW(PORT) PORTB &= ~(1 << PORT)
+  33:lib/ssd1306xled/ssd1306xled.c **** 
+  34:lib/ssd1306xled/ssd1306xled.c **** // ----------------------------------------------------------------------------
+  35:lib/ssd1306xled/ssd1306xled.c **** 
+  36:lib/ssd1306xled/ssd1306xled.c **** // Some code based on "IIC_wtihout_ACK" by http://www.14blog.com/archives/1358
+  37:lib/ssd1306xled/ssd1306xled.c **** 
+  38:lib/ssd1306xled/ssd1306xled.c **** const uint8_t ssd1306_init_sequence [] PROGMEM = {	// Initialization Sequence
+  39:lib/ssd1306xled/ssd1306xled.c **** 	0xAE,			// Display OFF (sleep mode)
+  40:lib/ssd1306xled/ssd1306xled.c **** 	0x20, 0b00,		// Set Memory Addressing Mode
+  41:lib/ssd1306xled/ssd1306xled.c **** 					// 00=Horizontal Addressing Mode; 01=Vertical Addressing Mode;
+  42:lib/ssd1306xled/ssd1306xled.c **** 					// 10=Page Addressing Mode (RESET); 11=Invalid
+  43:lib/ssd1306xled/ssd1306xled.c **** 	0xB0,			// Set Page Start Address for Page Addressing Mode, 0-7
+  44:lib/ssd1306xled/ssd1306xled.c **** 	0xC8,			// Set COM Output Scan Direction
+  45:lib/ssd1306xled/ssd1306xled.c **** 	0x10,			// ---set low column address
+  46:lib/ssd1306xled/ssd1306xled.c **** 	0x00,			// ---set high column address
+  47:lib/ssd1306xled/ssd1306xled.c **** 	0x40,			// --set start line address
+  48:lib/ssd1306xled/ssd1306xled.c **** 	0x81, 0x3F,		// Set contrast control register
+  49:lib/ssd1306xled/ssd1306xled.c **** 	0xA1,			// Set Segment Re-map. A0=address mapped; A1=address 127 mapped. 
+  50:lib/ssd1306xled/ssd1306xled.c **** 	0xA6,			// Set display mode. A6=Normal; A7=Inverse
+  51:lib/ssd1306xled/ssd1306xled.c **** 	0xA8, 0x3F,		// Set multiplex ratio(1 to 64)
+  52:lib/ssd1306xled/ssd1306xled.c **** 	0xA4,			// Output RAM to Display
+  53:lib/ssd1306xled/ssd1306xled.c **** 					// 0xA4=Output follows RAM content; 0xA5,Output ignores RAM content
+  54:lib/ssd1306xled/ssd1306xled.c **** 	0xD3, 0x00,		// Set display offset. 00 = no offset
+  55:lib/ssd1306xled/ssd1306xled.c **** 	0xD5,			// --set display clock divide ratio/oscillator frequency
+  56:lib/ssd1306xled/ssd1306xled.c **** 	0xF0,			// --set divide ratio
+  57:lib/ssd1306xled/ssd1306xled.c **** 	0xD9, 0x22,		// Set pre-charge period
+  58:lib/ssd1306xled/ssd1306xled.c **** 	0xDA, 0x12,		// Set com pins hardware configuration		
+  59:lib/ssd1306xled/ssd1306xled.c **** 	0xDB,			// --set vcomh
+  60:lib/ssd1306xled/ssd1306xled.c **** 	0x20,			// 0x20,0.77xVcc
+  61:lib/ssd1306xled/ssd1306xled.c **** 	0x8D, 0x14,		// Set DC-DC enable
+  62:lib/ssd1306xled/ssd1306xled.c **** 	0xAF			// Display ON in normal mode
+  63:lib/ssd1306xled/ssd1306xled.c **** 	
+  64:lib/ssd1306xled/ssd1306xled.c **** };
+  65:lib/ssd1306xled/ssd1306xled.c **** 
+  66:lib/ssd1306xled/ssd1306xled.c **** // ----------------------------------------------------------------------------
+  67:lib/ssd1306xled/ssd1306xled.c **** 
+  68:lib/ssd1306xled/ssd1306xled.c **** // These function should become separate library for handling I2C simplified output.
+  69:lib/ssd1306xled/ssd1306xled.c **** 
+  70:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_xfer_start(void)
+  71:lib/ssd1306xled/ssd1306xled.c **** {
+  15               		.loc 1 71 0
+  16               		.cfi_startproc
+  17               	/* prologue: function */
+  18               	/* frame size = 0 */
+  19               	/* stack size = 0 */
+  20               	.L__stack_usage = 0
+  72:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_HIGH(SSD1306_SCL);	// Set to HIGH
+  21               		.loc 1 72 0
+  22 0000 C09A      		sbi 0x18,0
+  73:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_HIGH(SSD1306_SDA);	// Set to HIGH
+  23               		.loc 1 73 0
+  24 0002 C19A      		sbi 0x18,1
+  74:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_LOW(SSD1306_SDA);		// Set to LOW
+  25               		.loc 1 74 0
+  26 0004 C198      		cbi 0x18,1
+  75:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_LOW(SSD1306_SCL);		// Set to LOW
+  27               		.loc 1 75 0
+  28 0006 C098      		cbi 0x18,0
+  29 0008 0895      		ret
+  30               		.cfi_endproc
+  31               	.LFE5:
+  33               	.global	ssd1306_xfer_stop
+  35               	ssd1306_xfer_stop:
+  36               	.LFB6:
+  76:lib/ssd1306xled/ssd1306xled.c **** }
+  77:lib/ssd1306xled/ssd1306xled.c **** 
+  78:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_xfer_stop(void)
+  79:lib/ssd1306xled/ssd1306xled.c **** {
+  37               		.loc 1 79 0
+  38               		.cfi_startproc
+  39               	/* prologue: function */
+  40               	/* frame size = 0 */
+  41               	/* stack size = 0 */
+  42               	.L__stack_usage = 0
+  80:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_LOW(SSD1306_SCL);		// Set to LOW
+  43               		.loc 1 80 0
+  44 000a C098      		cbi 0x18,0
+  81:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_LOW(SSD1306_SDA);		// Set to LOW
+  45               		.loc 1 81 0
+  46 000c C198      		cbi 0x18,1
+  82:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_HIGH(SSD1306_SCL);	// Set to HIGH
+  47               		.loc 1 82 0
+  48 000e C09A      		sbi 0x18,0
+  83:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_HIGH(SSD1306_SDA);	// Set to HIGH
+  49               		.loc 1 83 0
+  50 0010 C19A      		sbi 0x18,1
+  51 0012 0895      		ret
+  52               		.cfi_endproc
+  53               	.LFE6:
+  55               	.global	ssd1306_send_byte
+  57               	ssd1306_send_byte:
+  58               	.LFB7:
+  84:lib/ssd1306xled/ssd1306xled.c **** }
+  85:lib/ssd1306xled/ssd1306xled.c **** 
+  86:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_send_byte(uint8_t byte)
+  87:lib/ssd1306xled/ssd1306xled.c **** {
+  59               		.loc 1 87 0
+  60               		.cfi_startproc
+  61               	.LVL0:
+  62               	/* prologue: function */
+  63               	/* frame size = 0 */
+  64               	/* stack size = 0 */
+  65               	.L__stack_usage = 0
+  66               		.loc 1 87 0
+  67 0014 20E0      		ldi r18,0
+  68 0016 30E0      		ldi r19,0
+  88:lib/ssd1306xled/ssd1306xled.c **** 	uint8_t i;
+  89:lib/ssd1306xled/ssd1306xled.c **** 	for (i = 0; i < 8; i++)
+  90:lib/ssd1306xled/ssd1306xled.c **** 	{
+  91:lib/ssd1306xled/ssd1306xled.c **** 		if ((byte << i) & 0x80)
+  69               		.loc 1 91 0
+  70 0018 90E0      		ldi r25,0
+  71               	.LVL1:
+  72               	.L6:
+  73 001a AC01      		movw r20,r24
+  74 001c 022E      		mov r0,r18
+  75 001e 00C0      		rjmp 2f
+  76               		1:
+  77 0020 440F      		lsl r20
+  78               		2:
+  79 0022 0A94      		dec r0
+  80 0024 02F4      		brpl 1b
+  81 0026 47FF      		sbrs r20,7
+  82 0028 00C0      		rjmp .L4
+  92:lib/ssd1306xled/ssd1306xled.c **** 			DIGITAL_WRITE_HIGH(SSD1306_SDA);
+  83               		.loc 1 92 0
+  84 002a C19A      		sbi 0x18,1
+  85 002c 00C0      		rjmp .L5
+  86               	.L4:
+  93:lib/ssd1306xled/ssd1306xled.c **** 		else
+  94:lib/ssd1306xled/ssd1306xled.c **** 			DIGITAL_WRITE_LOW(SSD1306_SDA);
+  87               		.loc 1 94 0
+  88 002e C198      		cbi 0x18,1
+  89               	.L5:
+  95:lib/ssd1306xled/ssd1306xled.c **** 		
+  96:lib/ssd1306xled/ssd1306xled.c **** 		DIGITAL_WRITE_HIGH(SSD1306_SCL);
+  90               		.loc 1 96 0 discriminator 2
+  91 0030 C09A      		sbi 0x18,0
+  97:lib/ssd1306xled/ssd1306xled.c **** 		DIGITAL_WRITE_LOW(SSD1306_SCL);
+  92               		.loc 1 97 0 discriminator 2
+  93 0032 C098      		cbi 0x18,0
+  94               	.LVL2:
+  95 0034 2F5F      		subi r18,-1
+  96 0036 3F4F      		sbci r19,-1
+  97               	.LVL3:
+  89:lib/ssd1306xled/ssd1306xled.c **** 	{
+  98               		.loc 1 89 0 discriminator 2
+  99 0038 2830      		cpi r18,8
+ 100 003a 3105      		cpc r19,__zero_reg__
+ 101 003c 01F4      		brne .L6
+  98:lib/ssd1306xled/ssd1306xled.c **** 	}
+  99:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_HIGH(SSD1306_SDA);
+ 102               		.loc 1 99 0
+ 103 003e C19A      		sbi 0x18,1
+ 100:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_HIGH(SSD1306_SCL);
+ 104               		.loc 1 100 0
+ 105 0040 C09A      		sbi 0x18,0
+ 101:lib/ssd1306xled/ssd1306xled.c **** 	DIGITAL_WRITE_LOW(SSD1306_SCL);
+ 106               		.loc 1 101 0
+ 107 0042 C098      		cbi 0x18,0
+ 108 0044 0895      		ret
+ 109               		.cfi_endproc
+ 110               	.LFE7:
+ 112               	.global	ssd1306_send_command_start
+ 114               	ssd1306_send_command_start:
+ 115               	.LFB8:
+ 102:lib/ssd1306xled/ssd1306xled.c **** }
+ 103:lib/ssd1306xled/ssd1306xled.c **** 
+ 104:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_send_command_start(void) {
+ 116               		.loc 1 104 0
+ 117               		.cfi_startproc
+ 118               	/* prologue: function */
+ 119               	/* frame size = 0 */
+ 120               	/* stack size = 0 */
+ 121               	.L__stack_usage = 0
+ 105:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_xfer_start();
+ 122               		.loc 1 105 0
+ 123 0046 00D0      		rcall ssd1306_xfer_start
+ 124               	.LVL4:
+ 106:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_byte(SSD1306_SA);  // Slave address, SA0=0
+ 125               		.loc 1 106 0
+ 126 0048 88E7      		ldi r24,lo8(120)
+ 127 004a 00D0      		rcall ssd1306_send_byte
+ 128               	.LVL5:
+ 107:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_byte(0x00);	// write command
+ 129               		.loc 1 107 0
+ 130 004c 80E0      		ldi r24,0
+ 131 004e 00C0      		rjmp ssd1306_send_byte
+ 132               	.LVL6:
+ 133               		.cfi_endproc
+ 134               	.LFE8:
+ 136               	.global	ssd1306_send_command_stop
+ 138               	ssd1306_send_command_stop:
+ 139               	.LFB9:
+ 108:lib/ssd1306xled/ssd1306xled.c **** }
+ 109:lib/ssd1306xled/ssd1306xled.c **** 
+ 110:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_send_command_stop(void) {
+ 140               		.loc 1 110 0
+ 141               		.cfi_startproc
+ 142               	/* prologue: function */
+ 143               	/* frame size = 0 */
+ 144               	/* stack size = 0 */
+ 145               	.L__stack_usage = 0
+ 111:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_xfer_stop();
+ 146               		.loc 1 111 0
+ 147 0050 00C0      		rjmp ssd1306_xfer_stop
+ 148               	.LVL7:
+ 149               		.cfi_endproc
+ 150               	.LFE9:
+ 152               	.global	ssd1306_send_command
+ 154               	ssd1306_send_command:
+ 155               	.LFB10:
+ 112:lib/ssd1306xled/ssd1306xled.c **** }
+ 113:lib/ssd1306xled/ssd1306xled.c **** 
+ 114:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_send_command(uint8_t command)
+ 115:lib/ssd1306xled/ssd1306xled.c **** {
+ 156               		.loc 1 115 0
+ 157               		.cfi_startproc
+ 158               	.LVL8:
+ 159 0052 CF93      		push r28
+ 160               	.LCFI0:
+ 161               		.cfi_def_cfa_offset 3
+ 162               		.cfi_offset 28, -2
+ 163 0054 DF93      		push r29
+ 164               	.LCFI1:
+ 165               		.cfi_def_cfa_offset 4
+ 166               		.cfi_offset 29, -3
+ 167 0056 1F92      		push __zero_reg__
+ 168               	.LCFI2:
+ 169               		.cfi_def_cfa_offset 5
+ 170 0058 CDB7      		in r28,__SP_L__
+ 171 005a DEB7      		in r29,__SP_H__
+ 172               	.LCFI3:
+ 173               		.cfi_def_cfa_register 28
+ 174               	/* prologue: function */
+ 175               	/* frame size = 1 */
+ 176               	/* stack size = 3 */
+ 177               	.L__stack_usage = 3
+ 116:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_command_start();
+ 178               		.loc 1 116 0
+ 179 005c 8983      		std Y+1,r24
+ 180 005e 00D0      		rcall ssd1306_send_command_start
+ 181               	.LVL9:
+ 117:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_byte(command);
+ 182               		.loc 1 117 0
+ 183 0060 8981      		ldd r24,Y+1
+ 184 0062 00D0      		rcall ssd1306_send_byte
+ 185               	.LVL10:
+ 186               	/* epilogue start */
+ 118:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_command_stop();
+ 119:lib/ssd1306xled/ssd1306xled.c **** }
+ 187               		.loc 1 119 0
+ 188 0064 0F90      		pop __tmp_reg__
+ 189 0066 DF91      		pop r29
+ 190 0068 CF91      		pop r28
+ 191               	.LBB17:
+ 192               	.LBB18:
+ 111:lib/ssd1306xled/ssd1306xled.c **** }
+ 193               		.loc 1 111 0
+ 194 006a 00C0      		rjmp ssd1306_xfer_stop
+ 195               	.LVL11:
+ 196               	.LBE18:
+ 197               	.LBE17:
+ 198               		.cfi_endproc
+ 199               	.LFE10:
+ 201               	.global	ssd1306_send_data_start
+ 203               	ssd1306_send_data_start:
+ 204               	.LFB11:
+ 120:lib/ssd1306xled/ssd1306xled.c **** 
+ 121:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_send_data_start(void)
+ 122:lib/ssd1306xled/ssd1306xled.c **** {
+ 205               		.loc 1 122 0
+ 206               		.cfi_startproc
+ 207               	/* prologue: function */
+ 208               	/* frame size = 0 */
+ 209               	/* stack size = 0 */
+ 210               	.L__stack_usage = 0
+ 123:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_xfer_start();
+ 211               		.loc 1 123 0
+ 212 006c 00D0      		rcall ssd1306_xfer_start
+ 213               	.LVL12:
+ 124:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_byte(SSD1306_SA);
+ 214               		.loc 1 124 0
+ 215 006e 88E7      		ldi r24,lo8(120)
+ 216 0070 00D0      		rcall ssd1306_send_byte
+ 217               	.LVL13:
+ 125:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_byte(0x40);	//write data
+ 218               		.loc 1 125 0
+ 219 0072 80E4      		ldi r24,lo8(64)
+ 220 0074 00C0      		rjmp ssd1306_send_byte
+ 221               	.LVL14:
+ 222               		.cfi_endproc
+ 223               	.LFE11:
+ 225               	.global	ssd1306_send_data_stop
+ 227               	ssd1306_send_data_stop:
+ 228               	.LFB12:
+ 126:lib/ssd1306xled/ssd1306xled.c **** }
+ 127:lib/ssd1306xled/ssd1306xled.c **** 
+ 128:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_send_data_stop(void)
+ 129:lib/ssd1306xled/ssd1306xled.c **** {
+ 229               		.loc 1 129 0
+ 230               		.cfi_startproc
+ 231               	/* prologue: function */
+ 232               	/* frame size = 0 */
+ 233               	/* stack size = 0 */
+ 234               	.L__stack_usage = 0
+ 130:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_xfer_stop();
+ 235               		.loc 1 130 0
+ 236 0076 00C0      		rjmp ssd1306_xfer_stop
+ 237               	.LVL15:
+ 238               		.cfi_endproc
+ 239               	.LFE12:
+ 241               	.global	ssd1306_init
+ 243               	ssd1306_init:
+ 244               	.LFB13:
+ 131:lib/ssd1306xled/ssd1306xled.c **** }
+ 132:lib/ssd1306xled/ssd1306xled.c **** 
+ 133:lib/ssd1306xled/ssd1306xled.c **** /*
+ 134:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_send_data(uint8_t byte)
+ 135:lib/ssd1306xled/ssd1306xled.c **** {
+ 136:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_data_start();
+ 137:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_byte(byte);
+ 138:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_data_stop();
+ 139:lib/ssd1306xled/ssd1306xled.c **** }
+ 140:lib/ssd1306xled/ssd1306xled.c **** */
+ 141:lib/ssd1306xled/ssd1306xled.c **** 
+ 142:lib/ssd1306xled/ssd1306xled.c **** // ----------------------------------------------------------------------------
+ 143:lib/ssd1306xled/ssd1306xled.c **** 
+ 144:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_init(void)
+ 145:lib/ssd1306xled/ssd1306xled.c **** {
+ 245               		.loc 1 145 0
+ 246               		.cfi_startproc
+ 247 0078 1F93      		push r17
+ 248               	.LCFI4:
+ 249               		.cfi_def_cfa_offset 3
+ 250               		.cfi_offset 17, -2
+ 251 007a CF93      		push r28
+ 252               	.LCFI5:
+ 253               		.cfi_def_cfa_offset 4
+ 254               		.cfi_offset 28, -3
+ 255 007c DF93      		push r29
+ 256               	.LCFI6:
+ 257               		.cfi_def_cfa_offset 5
+ 258               		.cfi_offset 29, -4
+ 259               	/* prologue: function */
+ 260               	/* frame size = 0 */
+ 261               	/* stack size = 3 */
+ 262               	.L__stack_usage = 3
+ 146:lib/ssd1306xled/ssd1306xled.c **** 	DDRB |= (1 << SSD1306_SDA);	// Set port as output
+ 263               		.loc 1 146 0
+ 264 007e B99A      		sbi 0x17,1
+ 147:lib/ssd1306xled/ssd1306xled.c **** 	DDRB |= (1 << SSD1306_SCL);	// Set port as output
+ 265               		.loc 1 147 0
+ 266 0080 B89A      		sbi 0x17,0
+ 267               	.LVL16:
+ 268 0082 C0E0      		ldi r28,lo8(ssd1306_init_sequence)
+ 269 0084 D0E0      		ldi r29,hi8(ssd1306_init_sequence)
+ 270 0086 1C2F      		mov r17,r28
+ 271 0088 145E      		subi r17,lo8(-(28))
+ 272               	.LVL17:
+ 273               	.L15:
+ 274               	.LBB19:
+ 275               	.LBB20:
+ 148:lib/ssd1306xled/ssd1306xled.c **** 	
+ 149:lib/ssd1306xled/ssd1306xled.c **** 	for (uint8_t i = 0; i < sizeof (ssd1306_init_sequence); i++) {
+ 150:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_command(pgm_read_byte(&ssd1306_init_sequence[i]));
+ 276               		.loc 1 150 0 discriminator 3
+ 277 008a FE01      		movw r30,r28
+ 278               	/* #APP */
+ 279               	 ;  150 "lib/ssd1306xled/ssd1306xled.c" 1
+ 280 008c 8491      		lpm r24, Z
+ 281               		
+ 282               	 ;  0 "" 2
+ 283               	.LVL18:
+ 284               	/* #NOAPP */
+ 285               	.LBE20:
+ 286 008e 00D0      		rcall ssd1306_send_command
+ 287               	.LVL19:
+ 288 0090 2196      		adiw r28,1
+ 289               	.LVL20:
+ 149:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_command(pgm_read_byte(&ssd1306_init_sequence[i]));
+ 290               		.loc 1 149 0 discriminator 3
+ 291 0092 1C13      		cpse r17,r28
+ 292 0094 00C0      		rjmp .L15
+ 293               	/* epilogue start */
+ 294               	.LBE19:
+ 151:lib/ssd1306xled/ssd1306xled.c **** 	}
+ 152:lib/ssd1306xled/ssd1306xled.c **** }
+ 295               		.loc 1 152 0
+ 296 0096 DF91      		pop r29
+ 297 0098 CF91      		pop r28
+ 298               	.LVL21:
+ 299 009a 1F91      		pop r17
+ 300 009c 0895      		ret
+ 301               		.cfi_endproc
+ 302               	.LFE13:
+ 304               	.global	ssd1306_setpos
+ 306               	ssd1306_setpos:
+ 307               	.LFB15:
+ 153:lib/ssd1306xled/ssd1306xled.c **** 
+ 154:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_flip(){
+ 155:lib/ssd1306xled/ssd1306xled.c ****     static uint8_t flipped = 0;
+ 156:lib/ssd1306xled/ssd1306xled.c ****     
+ 157:lib/ssd1306xled/ssd1306xled.c ****     ssd1306_fill(0x00); // Clear screen
+ 158:lib/ssd1306xled/ssd1306xled.c ****     //flip the bit
+ 159:lib/ssd1306xled/ssd1306xled.c ****     flipped = !flipped;
+ 160:lib/ssd1306xled/ssd1306xled.c ****     if(flipped){
+ 161:lib/ssd1306xled/ssd1306xled.c ****         ssd1306_send_command(0xA1);
+ 162:lib/ssd1306xled/ssd1306xled.c ****         ssd1306_send_command(0xC8);
+ 163:lib/ssd1306xled/ssd1306xled.c ****     }else{
+ 164:lib/ssd1306xled/ssd1306xled.c ****         ssd1306_send_command(0xA0);
+ 165:lib/ssd1306xled/ssd1306xled.c ****         ssd1306_send_command(0xC0);
+ 166:lib/ssd1306xled/ssd1306xled.c ****     }
+ 167:lib/ssd1306xled/ssd1306xled.c **** }
+ 168:lib/ssd1306xled/ssd1306xled.c **** 
+ 169:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_setpos(uint8_t x, uint8_t y)
+ 170:lib/ssd1306xled/ssd1306xled.c **** {
+ 308               		.loc 1 170 0
+ 309               		.cfi_startproc
+ 310               	.LVL22:
+ 311 009e 1F93      		push r17
+ 312               	.LCFI7:
+ 313               		.cfi_def_cfa_offset 3
+ 314               		.cfi_offset 17, -2
+ 315 00a0 CF93      		push r28
+ 316               	.LCFI8:
+ 317               		.cfi_def_cfa_offset 4
+ 318               		.cfi_offset 28, -3
+ 319 00a2 DF93      		push r29
+ 320               	.LCFI9:
+ 321               		.cfi_def_cfa_offset 5
+ 322               		.cfi_offset 29, -4
+ 323 00a4 1F92      		push __zero_reg__
+ 324               	.LCFI10:
+ 325               		.cfi_def_cfa_offset 6
+ 326 00a6 CDB7      		in r28,__SP_L__
+ 327 00a8 DEB7      		in r29,__SP_H__
+ 328               	.LCFI11:
+ 329               		.cfi_def_cfa_register 28
+ 330               	/* prologue: function */
+ 331               	/* frame size = 1 */
+ 332               	/* stack size = 4 */
+ 333               	.L__stack_usage = 4
+ 334 00aa 182F      		mov r17,r24
+ 171:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_command_start();
+ 335               		.loc 1 171 0
+ 336 00ac 6983      		std Y+1,r22
+ 337 00ae 00D0      		rcall ssd1306_send_command_start
+ 338               	.LVL23:
+ 172:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_byte(0xb0 + y);
+ 339               		.loc 1 172 0
+ 340 00b0 6981      		ldd r22,Y+1
+ 341 00b2 80EB      		ldi r24,lo8(-80)
+ 342 00b4 860F      		add r24,r22
+ 343 00b6 00D0      		rcall ssd1306_send_byte
+ 344               	.LVL24:
+ 173:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_byte(((x & 0xf0) >> 4) | 0x10); // | 0x10
+ 345               		.loc 1 173 0
+ 346 00b8 812F      		mov r24,r17
+ 347 00ba 8295      		swap r24
+ 348 00bc 8F70      		andi r24,lo8(15)
+ 349 00be 8061      		ori r24,lo8(16)
+ 350 00c0 00D0      		rcall ssd1306_send_byte
+ 351               	.LVL25:
+ 174:lib/ssd1306xled/ssd1306xled.c **** /* TODO: Verify correctness */	ssd1306_send_byte((x & 0x0f)); // | 0x01
+ 352               		.loc 1 174 0
+ 353 00c2 812F      		mov r24,r17
+ 354 00c4 8F70      		andi r24,lo8(15)
+ 355 00c6 00D0      		rcall ssd1306_send_byte
+ 356               	.LVL26:
+ 357               	/* epilogue start */
+ 175:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_command_stop();
+ 176:lib/ssd1306xled/ssd1306xled.c **** }
+ 358               		.loc 1 176 0
+ 359 00c8 0F90      		pop __tmp_reg__
+ 360 00ca DF91      		pop r29
+ 361 00cc CF91      		pop r28
+ 362 00ce 1F91      		pop r17
+ 363               	.LVL27:
+ 364               	.LBB21:
+ 365               	.LBB22:
+ 111:lib/ssd1306xled/ssd1306xled.c **** }
+ 366               		.loc 1 111 0
+ 367 00d0 00C0      		rjmp ssd1306_xfer_stop
+ 368               	.LVL28:
+ 369               	.LBE22:
+ 370               	.LBE21:
+ 371               		.cfi_endproc
+ 372               	.LFE15:
+ 374               	.global	ssd1306_fillp
+ 376               	ssd1306_fillp:
+ 377               	.LFB16:
+ 177:lib/ssd1306xled/ssd1306xled.c **** 
+ 178:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_fillp(uint8_t p1, uint8_t p2)
+ 179:lib/ssd1306xled/ssd1306xled.c **** {
+ 378               		.loc 1 179 0
+ 379               		.cfi_startproc
+ 380               	.LVL29:
+ 381 00d2 0F93      		push r16
+ 382               	.LCFI12:
+ 383               		.cfi_def_cfa_offset 3
+ 384               		.cfi_offset 16, -2
+ 385 00d4 1F93      		push r17
+ 386               	.LCFI13:
+ 387               		.cfi_def_cfa_offset 4
+ 388               		.cfi_offset 17, -3
+ 389 00d6 CF93      		push r28
+ 390               	.LCFI14:
+ 391               		.cfi_def_cfa_offset 5
+ 392               		.cfi_offset 28, -4
+ 393 00d8 DF93      		push r29
+ 394               	.LCFI15:
+ 395               		.cfi_def_cfa_offset 6
+ 396               		.cfi_offset 29, -5
+ 397               	/* prologue: function */
+ 398               	/* frame size = 0 */
+ 399               	/* stack size = 4 */
+ 400               	.L__stack_usage = 4
+ 401 00da 082F      		mov r16,r24
+ 402 00dc 162F      		mov r17,r22
+ 180:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_setpos(0, 0);
+ 403               		.loc 1 180 0
+ 404 00de 60E0      		ldi r22,0
+ 405               	.LVL30:
+ 406 00e0 80E0      		ldi r24,0
+ 407               	.LVL31:
+ 408 00e2 00D0      		rcall ssd1306_setpos
+ 409               	.LVL32:
+ 181:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_data_start();
+ 410               		.loc 1 181 0
+ 411 00e4 00D0      		rcall ssd1306_send_data_start
+ 412               	.LVL33:
+ 413 00e6 C0E0      		ldi r28,0
+ 414 00e8 D2E0      		ldi r29,lo8(2)
+ 415               	.LVL34:
+ 416               	.L19:
+ 417               	.LBB23:
+ 182:lib/ssd1306xled/ssd1306xled.c **** 	for (uint16_t i = 0; i < 128 * 8 / 2; i++)
+ 183:lib/ssd1306xled/ssd1306xled.c **** 	{
+ 184:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_byte(p1);
+ 418               		.loc 1 184 0 discriminator 3
+ 419 00ea 802F      		mov r24,r16
+ 420 00ec 00D0      		rcall ssd1306_send_byte
+ 421               	.LVL35:
+ 185:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_byte(p2);
+ 422               		.loc 1 185 0 discriminator 3
+ 423 00ee 812F      		mov r24,r17
+ 424 00f0 00D0      		rcall ssd1306_send_byte
+ 425               	.LVL36:
+ 426 00f2 2197      		sbiw r28,1
+ 427               	.LVL37:
+ 182:lib/ssd1306xled/ssd1306xled.c **** 	for (uint16_t i = 0; i < 128 * 8 / 2; i++)
+ 428               		.loc 1 182 0 discriminator 3
+ 429 00f4 01F4      		brne .L19
+ 430               	/* epilogue start */
+ 431               	.LBE23:
+ 186:lib/ssd1306xled/ssd1306xled.c **** 	}
+ 187:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_data_stop();
+ 188:lib/ssd1306xled/ssd1306xled.c **** }
+ 432               		.loc 1 188 0
+ 433 00f6 DF91      		pop r29
+ 434 00f8 CF91      		pop r28
+ 435               	.LVL38:
+ 436 00fa 1F91      		pop r17
+ 437               	.LVL39:
+ 438 00fc 0F91      		pop r16
+ 439               	.LVL40:
+ 440               	.LBB24:
+ 441               	.LBB25:
+ 130:lib/ssd1306xled/ssd1306xled.c **** }
+ 442               		.loc 1 130 0
+ 443 00fe 00C0      		rjmp ssd1306_xfer_stop
+ 444               	.LVL41:
+ 445               	.LBE25:
+ 446               	.LBE24:
+ 447               		.cfi_endproc
+ 448               	.LFE16:
+ 450               	.global	ssd1306_fill
+ 452               	ssd1306_fill:
+ 453               	.LFB17:
+ 189:lib/ssd1306xled/ssd1306xled.c **** 
+ 190:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_fill(uint8_t p)
+ 191:lib/ssd1306xled/ssd1306xled.c **** {
+ 454               		.loc 1 191 0
+ 455               		.cfi_startproc
+ 456               	.LVL42:
+ 457               	/* prologue: function */
+ 458               	/* frame size = 0 */
+ 459               	/* stack size = 0 */
+ 460               	.L__stack_usage = 0
+ 192:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_fillp(p, p);
+ 461               		.loc 1 192 0
+ 462 0100 682F      		mov r22,r24
+ 463 0102 00C0      		rjmp ssd1306_fillp
+ 464               	.LVL43:
+ 465               		.cfi_endproc
+ 466               	.LFE17:
+ 468               	.global	ssd1306_flip
+ 470               	ssd1306_flip:
+ 471               	.LFB14:
+ 154:lib/ssd1306xled/ssd1306xled.c ****     static uint8_t flipped = 0;
+ 472               		.loc 1 154 0
+ 473               		.cfi_startproc
+ 474               	/* prologue: function */
+ 475               	/* frame size = 0 */
+ 476               	/* stack size = 0 */
+ 477               	.L__stack_usage = 0
+ 157:lib/ssd1306xled/ssd1306xled.c ****     //flip the bit
+ 478               		.loc 1 157 0
+ 479 0104 80E0      		ldi r24,0
+ 480 0106 00D0      		rcall ssd1306_fill
+ 481               	.LVL44:
+ 159:lib/ssd1306xled/ssd1306xled.c ****     if(flipped){
+ 482               		.loc 1 159 0
+ 483 0108 81E0      		ldi r24,lo8(1)
+ 484 010a 9091 0000 		lds r25,flipped.1915
+ 485 010e 9111      		cpse r25,__zero_reg__
+ 486 0110 80E0      		ldi r24,0
+ 487               	.L23:
+ 488 0112 8093 0000 		sts flipped.1915,r24
+ 160:lib/ssd1306xled/ssd1306xled.c ****         ssd1306_send_command(0xA1);
+ 489               		.loc 1 160 0
+ 490 0116 8823      		tst r24
+ 491 0118 01F0      		breq .L24
+ 161:lib/ssd1306xled/ssd1306xled.c ****         ssd1306_send_command(0xC8);
+ 492               		.loc 1 161 0
+ 493 011a 81EA      		ldi r24,lo8(-95)
+ 494 011c 00D0      		rcall ssd1306_send_command
+ 495               	.LVL45:
+ 162:lib/ssd1306xled/ssd1306xled.c ****     }else{
+ 496               		.loc 1 162 0
+ 497 011e 88EC      		ldi r24,lo8(-56)
+ 498 0120 00C0      		rjmp .L28
+ 499               	.L24:
+ 164:lib/ssd1306xled/ssd1306xled.c ****         ssd1306_send_command(0xC0);
+ 500               		.loc 1 164 0
+ 501 0122 80EA      		ldi r24,lo8(-96)
+ 502 0124 00D0      		rcall ssd1306_send_command
+ 503               	.LVL46:
+ 165:lib/ssd1306xled/ssd1306xled.c ****     }
+ 504               		.loc 1 165 0
+ 505 0126 80EC      		ldi r24,lo8(-64)
+ 506               	.L28:
+ 507 0128 00C0      		rjmp ssd1306_send_command
+ 508               	.LVL47:
+ 509               		.cfi_endproc
+ 510               	.LFE14:
+ 512               	.global	ssd1306_char_font6x8
+ 514               	ssd1306_char_font6x8:
+ 515               	.LFB18:
+ 193:lib/ssd1306xled/ssd1306xled.c **** }
+ 194:lib/ssd1306xled/ssd1306xled.c **** 
+ 195:lib/ssd1306xled/ssd1306xled.c **** /*
+ 196:lib/ssd1306xled/ssd1306xled.c **** // TODO: Remove this, no longer used.
+ 197:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_fillscreen(uint8_t fill)
+ 198:lib/ssd1306xled/ssd1306xled.c **** {
+ 199:lib/ssd1306xled/ssd1306xled.c **** 	for (uint8_t m = 0; m < 8; m++)
+ 200:lib/ssd1306xled/ssd1306xled.c **** 	{
+ 201:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_command(0xb0 + m);	// page0 - page1
+ 202:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_command(0x00);		// low column start address
+ 203:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_command(0x10);		// high column start address
+ 204:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_data_start();
+ 205:lib/ssd1306xled/ssd1306xled.c **** 		for (uint8_t n = 0; n < 128; n++)
+ 206:lib/ssd1306xled/ssd1306xled.c **** 		{
+ 207:lib/ssd1306xled/ssd1306xled.c **** 			ssd1306_send_byte(fill);
+ 208:lib/ssd1306xled/ssd1306xled.c **** 		}
+ 209:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_data_stop();
+ 210:lib/ssd1306xled/ssd1306xled.c **** 	}
+ 211:lib/ssd1306xled/ssd1306xled.c **** }
+ 212:lib/ssd1306xled/ssd1306xled.c **** */
+ 213:lib/ssd1306xled/ssd1306xled.c **** 
+ 214:lib/ssd1306xled/ssd1306xled.c **** // ----------------------------------------------------------------------------
+ 215:lib/ssd1306xled/ssd1306xled.c **** 
+ 216:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_char_font6x8(char ch) {
+ 516               		.loc 1 216 0
+ 517               		.cfi_startproc
+ 518               	.LVL48:
+ 519 012a EF92      		push r14
+ 520               	.LCFI16:
+ 521               		.cfi_def_cfa_offset 3
+ 522               		.cfi_offset 14, -2
+ 523 012c FF92      		push r15
+ 524               	.LCFI17:
+ 525               		.cfi_def_cfa_offset 4
+ 526               		.cfi_offset 15, -3
+ 527 012e 0F93      		push r16
+ 528               	.LCFI18:
+ 529               		.cfi_def_cfa_offset 5
+ 530               		.cfi_offset 16, -4
+ 531 0130 1F93      		push r17
+ 532               	.LCFI19:
+ 533               		.cfi_def_cfa_offset 6
+ 534               		.cfi_offset 17, -5
+ 535 0132 CF93      		push r28
+ 536               	.LCFI20:
+ 537               		.cfi_def_cfa_offset 7
+ 538               		.cfi_offset 28, -6
+ 539 0134 DF93      		push r29
+ 540               	.LCFI21:
+ 541               		.cfi_def_cfa_offset 8
+ 542               		.cfi_offset 29, -7
+ 543 0136 1F92      		push __zero_reg__
+ 544               	.LCFI22:
+ 545               		.cfi_def_cfa_offset 9
+ 546 0138 CDB7      		in r28,__SP_L__
+ 547 013a DEB7      		in r29,__SP_H__
+ 548               	.LCFI23:
+ 549               		.cfi_def_cfa_register 28
+ 550               	/* prologue: function */
+ 551               	/* frame size = 1 */
+ 552               	/* stack size = 7 */
+ 553               	.L__stack_usage = 7
+ 554               	.LVL49:
+ 217:lib/ssd1306xled/ssd1306xled.c **** 	uint8_t c = ch - 32;
+ 218:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_data_start();
+ 555               		.loc 1 218 0
+ 556 013c 8983      		std Y+1,r24
+ 557 013e 00D0      		rcall ssd1306_send_data_start
+ 558               	.LVL50:
+ 217:lib/ssd1306xled/ssd1306xled.c **** 	uint8_t c = ch - 32;
+ 559               		.loc 1 217 0
+ 560 0140 8981      		ldd r24,Y+1
+ 561 0142 8052      		subi r24,lo8(-(-32))
+ 562               	.LBB26:
+ 563               	.LBB27:
+ 219:lib/ssd1306xled/ssd1306xled.c **** 	for (uint8_t i = 0; i < 6; i++)
+ 220:lib/ssd1306xled/ssd1306xled.c **** 	{
+ 221:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_byte(pgm_read_byte(&ssd1306xled_font6x8[c * 6 + i]));
+ 564               		.loc 1 221 0
+ 565 0144 90E0      		ldi r25,0
+ 566 0146 66E0      		ldi r22,lo8(6)
+ 567 0148 70E0      		ldi r23,0
+ 568 014a 00D0      		rcall __mulhi3
+ 569 014c 8C01      		movw r16,r24
+ 570 014e E12C      		mov r14,__zero_reg__
+ 571 0150 F12C      		mov r15,__zero_reg__
+ 572               	.LVL51:
+ 573               	.L30:
+ 574 0152 F701      		movw r30,r14
+ 575 0154 E00F      		add r30,r16
+ 576 0156 F11F      		adc r31,r17
+ 577 0158 E050      		subi r30,lo8(-(ssd1306xled_font6x8))
+ 578 015a F040      		sbci r31,hi8(-(ssd1306xled_font6x8))
+ 579               	.LVL52:
+ 580               		.loc 1 221 0 is_stmt 0 discriminator 3
+ 581               	/* #APP */
+ 582               	 ;  221 "lib/ssd1306xled/ssd1306xled.c" 1
+ 583 015c 8491      		lpm r24, Z
+ 584               		
+ 585               	 ;  0 "" 2
+ 586               	.LVL53:
+ 587               	/* #NOAPP */
+ 588               	.LBE27:
+ 589 015e 00D0      		rcall ssd1306_send_byte
+ 590               	.LVL54:
+ 591 0160 8FEF      		ldi r24,-1
+ 592 0162 E81A      		sub r14,r24
+ 593 0164 F80A      		sbc r15,r24
+ 594               	.LVL55:
+ 219:lib/ssd1306xled/ssd1306xled.c **** 	for (uint8_t i = 0; i < 6; i++)
+ 595               		.loc 1 219 0 is_stmt 1 discriminator 3
+ 596 0166 86E0      		ldi r24,6
+ 597 0168 E816      		cp r14,r24
+ 598 016a F104      		cpc r15,__zero_reg__
+ 599 016c 01F4      		brne .L30
+ 600               	/* epilogue start */
+ 601               	.LBE26:
+ 222:lib/ssd1306xled/ssd1306xled.c **** 	}
+ 223:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_send_data_stop();
+ 224:lib/ssd1306xled/ssd1306xled.c **** }
+ 602               		.loc 1 224 0
+ 603 016e 0F90      		pop __tmp_reg__
+ 604 0170 DF91      		pop r29
+ 605 0172 CF91      		pop r28
+ 606 0174 1F91      		pop r17
+ 607 0176 0F91      		pop r16
+ 608               	.LVL56:
+ 609 0178 FF90      		pop r15
+ 610 017a EF90      		pop r14
+ 611               	.LVL57:
+ 612               	.LBB28:
+ 613               	.LBB29:
+ 130:lib/ssd1306xled/ssd1306xled.c **** }
+ 614               		.loc 1 130 0
+ 615 017c 00C0      		rjmp ssd1306_xfer_stop
+ 616               	.LVL58:
+ 617               	.LBE29:
+ 618               	.LBE28:
+ 619               		.cfi_endproc
+ 620               	.LFE18:
+ 622               	.global	ssd1306_string_font6x8
+ 624               	ssd1306_string_font6x8:
+ 625               	.LFB19:
+ 225:lib/ssd1306xled/ssd1306xled.c **** 
+ 226:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_string_font6x8(char *s) {
+ 626               		.loc 1 226 0
+ 627               		.cfi_startproc
+ 628               	.LVL59:
+ 629 017e CF93      		push r28
+ 630               	.LCFI24:
+ 631               		.cfi_def_cfa_offset 3
+ 632               		.cfi_offset 28, -2
+ 633 0180 DF93      		push r29
+ 634               	.LCFI25:
+ 635               		.cfi_def_cfa_offset 4
+ 636               		.cfi_offset 29, -3
+ 637               	/* prologue: function */
+ 638               	/* frame size = 0 */
+ 639               	/* stack size = 2 */
+ 640               	.L__stack_usage = 2
+ 641 0182 EC01      		movw r28,r24
+ 642               	.LVL60:
+ 643               	.L33:
+ 227:lib/ssd1306xled/ssd1306xled.c **** 	while (*s) {
+ 644               		.loc 1 227 0
+ 645 0184 8991      		ld r24,Y+
+ 646               	.LVL61:
+ 647 0186 8823      		tst r24
+ 648 0188 01F0      		breq .L35
+ 649               	.LVL62:
+ 228:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_char_font6x8(*s++);
+ 650               		.loc 1 228 0
+ 651 018a 00D0      		rcall ssd1306_char_font6x8
+ 652               	.LVL63:
+ 653 018c 00C0      		rjmp .L33
+ 654               	.LVL64:
+ 655               	.L35:
+ 656               	/* epilogue start */
+ 229:lib/ssd1306xled/ssd1306xled.c **** 	}
+ 230:lib/ssd1306xled/ssd1306xled.c **** }
+ 657               		.loc 1 230 0
+ 658 018e DF91      		pop r29
+ 659 0190 CF91      		pop r28
+ 660               	.LVL65:
+ 661 0192 0895      		ret
+ 662               		.cfi_endproc
+ 663               	.LFE19:
+ 665               	.global	ssd1306_numdec_font6x8
+ 667               	ssd1306_numdec_font6x8:
+ 668               	.LFB20:
+ 231:lib/ssd1306xled/ssd1306xled.c **** 
+ 232:lib/ssd1306xled/ssd1306xled.c **** char ssd1306_numdec_buffer[USINT2DECASCII_MAX_DIGITS + 1];
+ 233:lib/ssd1306xled/ssd1306xled.c **** 
+ 234:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_numdec_font6x8(uint16_t num) {
+ 669               		.loc 1 234 0
+ 670               		.cfi_startproc
+ 671               	.LVL66:
+ 672               	/* prologue: function */
+ 673               	/* frame size = 0 */
+ 674               	/* stack size = 0 */
+ 675               	.L__stack_usage = 0
+ 235:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_numdec_buffer[USINT2DECASCII_MAX_DIGITS] = '\0';   // Terminate the string.
+ 676               		.loc 1 235 0
+ 677 0194 1092 0000 		sts ssd1306_numdec_buffer+5,__zero_reg__
+ 236:lib/ssd1306xled/ssd1306xled.c **** 	uint8_t digits = usint2decascii(num, ssd1306_numdec_buffer);
+ 678               		.loc 1 236 0
+ 679 0198 60E0      		ldi r22,lo8(ssd1306_numdec_buffer)
+ 680 019a 70E0      		ldi r23,hi8(ssd1306_numdec_buffer)
+ 681 019c 00D0      		rcall usint2decascii
+ 682               	.LVL67:
+ 237:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_string_font6x8(ssd1306_numdec_buffer + digits);
+ 683               		.loc 1 237 0
+ 684 019e 90E0      		ldi r25,0
+ 685 01a0 8050      		subi r24,lo8(-(ssd1306_numdec_buffer))
+ 686 01a2 9040      		sbci r25,hi8(-(ssd1306_numdec_buffer))
+ 687               	.LVL68:
+ 688 01a4 00C0      		rjmp ssd1306_string_font6x8
+ 689               	.LVL69:
+ 690               		.cfi_endproc
+ 691               	.LFE20:
+ 693               	.global	ssd1306_numdecp_font6x8
+ 695               	ssd1306_numdecp_font6x8:
+ 696               	.LFB21:
+ 238:lib/ssd1306xled/ssd1306xled.c **** }
+ 239:lib/ssd1306xled/ssd1306xled.c **** 
+ 240:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_numdecp_font6x8(uint16_t num) {
+ 697               		.loc 1 240 0
+ 698               		.cfi_startproc
+ 699               	.LVL70:
+ 700               	/* prologue: function */
+ 701               	/* frame size = 0 */
+ 702               	/* stack size = 0 */
+ 703               	.L__stack_usage = 0
+ 241:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_numdec_buffer[USINT2DECASCII_MAX_DIGITS] = '\0';   // Terminate the string.
+ 704               		.loc 1 241 0
+ 705 01a6 1092 0000 		sts ssd1306_numdec_buffer+5,__zero_reg__
+ 242:lib/ssd1306xled/ssd1306xled.c **** 	usint2decascii(num, ssd1306_numdec_buffer);
+ 706               		.loc 1 242 0
+ 707 01aa 60E0      		ldi r22,lo8(ssd1306_numdec_buffer)
+ 708 01ac 70E0      		ldi r23,hi8(ssd1306_numdec_buffer)
+ 709 01ae 00D0      		rcall usint2decascii
+ 710               	.LVL71:
+ 243:lib/ssd1306xled/ssd1306xled.c **** 	ssd1306_string_font6x8(ssd1306_numdec_buffer);
+ 711               		.loc 1 243 0
+ 712 01b0 80E0      		ldi r24,lo8(ssd1306_numdec_buffer)
+ 713 01b2 90E0      		ldi r25,hi8(ssd1306_numdec_buffer)
+ 714 01b4 00C0      		rjmp ssd1306_string_font6x8
+ 715               	.LVL72:
+ 716               		.cfi_endproc
+ 717               	.LFE21:
+ 719               	.global	ssd1306_draw_bmp
+ 721               	ssd1306_draw_bmp:
+ 722               	.LFB22:
+ 244:lib/ssd1306xled/ssd1306xled.c **** }
+ 245:lib/ssd1306xled/ssd1306xled.c **** 
+ 246:lib/ssd1306xled/ssd1306xled.c **** // ----------------------------------------------------------------------------
+ 247:lib/ssd1306xled/ssd1306xled.c **** 
+ 248:lib/ssd1306xled/ssd1306xled.c **** void ssd1306_draw_bmp(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, const uint8_t bitmap[])
+ 249:lib/ssd1306xled/ssd1306xled.c **** {
+ 723               		.loc 1 249 0
+ 724               		.cfi_startproc
+ 725               	.LVL73:
+ 726 01b6 9F92      		push r9
+ 727               	.LCFI26:
+ 728               		.cfi_def_cfa_offset 3
+ 729               		.cfi_offset 9, -2
+ 730 01b8 AF92      		push r10
+ 731               	.LCFI27:
+ 732               		.cfi_def_cfa_offset 4
+ 733               		.cfi_offset 10, -3
+ 734 01ba BF92      		push r11
+ 735               	.LCFI28:
+ 736               		.cfi_def_cfa_offset 5
+ 737               		.cfi_offset 11, -4
+ 738 01bc CF92      		push r12
+ 739               	.LCFI29:
+ 740               		.cfi_def_cfa_offset 6
+ 741               		.cfi_offset 12, -5
+ 742 01be DF92      		push r13
+ 743               	.LCFI30:
+ 744               		.cfi_def_cfa_offset 7
+ 745               		.cfi_offset 13, -6
+ 746 01c0 EF92      		push r14
+ 747               	.LCFI31:
+ 748               		.cfi_def_cfa_offset 8
+ 749               		.cfi_offset 14, -7
+ 750 01c2 FF92      		push r15
+ 751               	.LCFI32:
+ 752               		.cfi_def_cfa_offset 9
+ 753               		.cfi_offset 15, -8
+ 754 01c4 0F93      		push r16
+ 755               	.LCFI33:
+ 756               		.cfi_def_cfa_offset 10
+ 757               		.cfi_offset 16, -9
+ 758 01c6 1F93      		push r17
+ 759               	.LCFI34:
+ 760               		.cfi_def_cfa_offset 11
+ 761               		.cfi_offset 17, -10
+ 762 01c8 CF93      		push r28
+ 763               	.LCFI35:
+ 764               		.cfi_def_cfa_offset 12
+ 765               		.cfi_offset 28, -11
+ 766 01ca DF93      		push r29
+ 767               	.LCFI36:
+ 768               		.cfi_def_cfa_offset 13
+ 769               		.cfi_offset 29, -12
+ 770               	/* prologue: function */
+ 771               	/* frame size = 0 */
+ 772               	/* stack size = 11 */
+ 773               	.L__stack_usage = 11
+ 774 01cc E82E      		mov r14,r24
+ 775 01ce F62E      		mov r15,r22
+ 776 01d0 942E      		mov r9,r20
+ 777 01d2 C22E      		mov r12,r18
+ 778 01d4 5801      		movw r10,r16
+ 779               	.LVL74:
+ 250:lib/ssd1306xled/ssd1306xled.c **** 	uint16_t j = 0;
+ 780               		.loc 1 250 0
+ 781 01d6 10E0      		ldi r17,0
+ 782 01d8 D12C      		mov r13,__zero_reg__
+ 783               	.LVL75:
+ 784               	.L39:
+ 251:lib/ssd1306xled/ssd1306xled.c **** 	uint8_t y;
+ 252:lib/ssd1306xled/ssd1306xled.c **** 	if (y1 % 8 == 0) y = y1 / 8;
+ 253:lib/ssd1306xled/ssd1306xled.c **** 	else y = y1 / 8 + 1;
+ 254:lib/ssd1306xled/ssd1306xled.c **** 	for (y = y0; y < y1; y++)
+ 785               		.loc 1 254 0 discriminator 1
+ 786 01da FC14      		cp r15,r12
+ 787 01dc 00F4      		brsh .L43
+ 255:lib/ssd1306xled/ssd1306xled.c **** 	{
+ 256:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_setpos(x0,y);
+ 788               		.loc 1 256 0
+ 789 01de 6F2D      		mov r22,r15
+ 790 01e0 8E2D      		mov r24,r14
+ 791 01e2 00D0      		rcall ssd1306_setpos
+ 792               	.LVL76:
+ 257:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_data_start();
+ 793               		.loc 1 257 0
+ 794 01e4 00D0      		rcall ssd1306_send_data_start
+ 795               	.LVL77:
+ 796               	.LBB30:
+ 258:lib/ssd1306xled/ssd1306xled.c **** 		for (uint8_t x = x0; x < x1; x++)
+ 797               		.loc 1 258 0
+ 798 01e6 C12F      		mov r28,r17
+ 799 01e8 DD2D      		mov r29,r13
+ 800 01ea 8E2D      		mov r24,r14
+ 801 01ec 811B      		sub r24,r17
+ 802 01ee 182F      		mov r17,r24
+ 803               	.LVL78:
+ 804               	.L40:
+ 805 01f0 8C2F      		mov r24,r28
+ 806 01f2 810F      		add r24,r17
+ 807               		.loc 1 258 0 is_stmt 0 discriminator 1
+ 808 01f4 8915      		cp r24,r9
+ 809 01f6 00F4      		brsh .L44
+ 810               	.LVL79:
+ 811 01f8 F501      		movw r30,r10
+ 812 01fa EC0F      		add r30,r28
+ 813 01fc FD1F      		adc r31,r29
+ 814               	.LVL80:
+ 815               	.LBB31:
+ 259:lib/ssd1306xled/ssd1306xled.c **** 		{
+ 260:lib/ssd1306xled/ssd1306xled.c **** 			ssd1306_send_byte(pgm_read_byte(&bitmap[j++]));
+ 816               		.loc 1 260 0 is_stmt 1 discriminator 3
+ 817               	/* #APP */
+ 818               	 ;  260 "lib/ssd1306xled/ssd1306xled.c" 1
+ 819 01fe 8491      		lpm r24, Z
+ 820               		
+ 821               	 ;  0 "" 2
+ 822               	.LVL81:
+ 823               	/* #NOAPP */
+ 824               	.LBE31:
+ 825 0200 00D0      		rcall ssd1306_send_byte
+ 826               	.LVL82:
+ 827 0202 2196      		adiw r28,1
+ 828               	.LVL83:
+ 829 0204 00C0      		rjmp .L40
+ 830               	.LVL84:
+ 831               	.L44:
+ 832               	.LBE30:
+ 833               	.LBB32:
+ 834               	.LBB33:
+ 130:lib/ssd1306xled/ssd1306xled.c **** }
+ 835               		.loc 1 130 0
+ 836 0206 00D0      		rcall ssd1306_xfer_stop
+ 837               	.LVL85:
+ 838               	.LBE33:
+ 839               	.LBE32:
+ 254:lib/ssd1306xled/ssd1306xled.c **** 	{
+ 840               		.loc 1 254 0
+ 841 0208 F394      		inc r15
+ 842               	.LVL86:
+ 843 020a 1C2F      		mov r17,r28
+ 844 020c DD2E      		mov r13,r29
+ 845 020e 00C0      		rjmp .L39
+ 846               	.LVL87:
+ 847               	.L43:
+ 848               	/* epilogue start */
+ 261:lib/ssd1306xled/ssd1306xled.c **** 		}
+ 262:lib/ssd1306xled/ssd1306xled.c **** 		ssd1306_send_data_stop();
+ 263:lib/ssd1306xled/ssd1306xled.c **** 	}
+ 264:lib/ssd1306xled/ssd1306xled.c **** }
+ 849               		.loc 1 264 0
+ 850 0210 DF91      		pop r29
+ 851 0212 CF91      		pop r28
+ 852 0214 1F91      		pop r17
+ 853 0216 0F91      		pop r16
+ 854 0218 FF90      		pop r15
+ 855               	.LVL88:
+ 856 021a EF90      		pop r14
+ 857               	.LVL89:
+ 858 021c DF90      		pop r13
+ 859 021e CF90      		pop r12
+ 860               	.LVL90:
+ 861 0220 BF90      		pop r11
+ 862 0222 AF90      		pop r10
+ 863               	.LVL91:
+ 864 0224 9F90      		pop r9
+ 865               	.LVL92:
+ 866 0226 0895      		ret
+ 867               		.cfi_endproc
+ 868               	.LFE22:
+ 870               		.local	flipped.1915
+ 871               		.comm	flipped.1915,1,1
+ 872               		.comm	ssd1306_numdec_buffer,6,1
+ 873               	.global	ssd1306_init_sequence
+ 874               		.section	.progmem.data,"a",@progbits
+ 877               	ssd1306_init_sequence:
+ 878 0000 AE        		.byte	-82
+ 879 0001 20        		.byte	32
+ 880 0002 00        		.byte	0
+ 881 0003 B0        		.byte	-80
+ 882 0004 C8        		.byte	-56
+ 883 0005 10        		.byte	16
+ 884 0006 00        		.byte	0
+ 885 0007 40        		.byte	64
+ 886 0008 81        		.byte	-127
+ 887 0009 3F        		.byte	63
+ 888 000a A1        		.byte	-95
+ 889 000b A6        		.byte	-90
+ 890 000c A8        		.byte	-88
+ 891 000d 3F        		.byte	63
+ 892 000e A4        		.byte	-92
+ 893 000f D3        		.byte	-45
+ 894 0010 00        		.byte	0
+ 895 0011 D5        		.byte	-43
+ 896 0012 F0        		.byte	-16
+ 897 0013 D9        		.byte	-39
+ 898 0014 22        		.byte	34
+ 899 0015 DA        		.byte	-38
+ 900 0016 12        		.byte	18
+ 901 0017 DB        		.byte	-37
+ 902 0018 20        		.byte	32
+ 903 0019 8D        		.byte	-115
+ 904 001a 14        		.byte	20
+ 905 001b AF        		.byte	-81
+ 906               	.global	ssd1306xled_font6x8
+ 909               	ssd1306xled_font6x8:
+ 910 001c 00        		.byte	0
+ 911 001d 00        		.byte	0
+ 912 001e 00        		.byte	0
+ 913 001f 00        		.byte	0
+ 914 0020 00        		.byte	0
+ 915 0021 00        		.byte	0
+ 916 0022 00        		.byte	0
+ 917 0023 00        		.byte	0
+ 918 0024 00        		.byte	0
+ 919 0025 2F        		.byte	47
+ 920 0026 00        		.byte	0
+ 921 0027 00        		.byte	0
+ 922 0028 00        		.byte	0
+ 923 0029 00        		.byte	0
+ 924 002a 07        		.byte	7
+ 925 002b 00        		.byte	0
+ 926 002c 07        		.byte	7
+ 927 002d 00        		.byte	0
+ 928 002e 00        		.byte	0
+ 929 002f 14        		.byte	20
+ 930 0030 7F        		.byte	127
+ 931 0031 14        		.byte	20
+ 932 0032 7F        		.byte	127
+ 933 0033 14        		.byte	20
+ 934 0034 00        		.byte	0
+ 935 0035 24        		.byte	36
+ 936 0036 2A        		.byte	42
+ 937 0037 7F        		.byte	127
+ 938 0038 2A        		.byte	42
+ 939 0039 12        		.byte	18
+ 940 003a 00        		.byte	0
+ 941 003b 62        		.byte	98
+ 942 003c 64        		.byte	100
+ 943 003d 08        		.byte	8
+ 944 003e 13        		.byte	19
+ 945 003f 23        		.byte	35
+ 946 0040 00        		.byte	0
+ 947 0041 36        		.byte	54
+ 948 0042 49        		.byte	73
+ 949 0043 55        		.byte	85
+ 950 0044 22        		.byte	34
+ 951 0045 50        		.byte	80
+ 952 0046 00        		.byte	0
+ 953 0047 00        		.byte	0
+ 954 0048 05        		.byte	5
+ 955 0049 03        		.byte	3
+ 956 004a 00        		.byte	0
+ 957 004b 00        		.byte	0
+ 958 004c 00        		.byte	0
+ 959 004d 00        		.byte	0
+ 960 004e 1C        		.byte	28
+ 961 004f 22        		.byte	34
+ 962 0050 41        		.byte	65
+ 963 0051 00        		.byte	0
+ 964 0052 00        		.byte	0
+ 965 0053 00        		.byte	0
+ 966 0054 41        		.byte	65
+ 967 0055 22        		.byte	34
+ 968 0056 1C        		.byte	28
+ 969 0057 00        		.byte	0
+ 970 0058 00        		.byte	0
+ 971 0059 14        		.byte	20
+ 972 005a 08        		.byte	8
+ 973 005b 3E        		.byte	62
+ 974 005c 08        		.byte	8
+ 975 005d 14        		.byte	20
+ 976 005e 00        		.byte	0
+ 977 005f 08        		.byte	8
+ 978 0060 08        		.byte	8
+ 979 0061 3E        		.byte	62
+ 980 0062 08        		.byte	8
+ 981 0063 08        		.byte	8
+ 982 0064 00        		.byte	0
+ 983 0065 00        		.byte	0
+ 984 0066 00        		.byte	0
+ 985 0067 A0        		.byte	-96
+ 986 0068 60        		.byte	96
+ 987 0069 00        		.byte	0
+ 988 006a 00        		.byte	0
+ 989 006b 08        		.byte	8
+ 990 006c 08        		.byte	8
+ 991 006d 08        		.byte	8
+ 992 006e 08        		.byte	8
+ 993 006f 08        		.byte	8
+ 994 0070 00        		.byte	0
+ 995 0071 00        		.byte	0
+ 996 0072 60        		.byte	96
+ 997 0073 60        		.byte	96
+ 998 0074 00        		.byte	0
+ 999 0075 00        		.byte	0
+ 1000 0076 00        		.byte	0
+ 1001 0077 20        		.byte	32
+ 1002 0078 10        		.byte	16
+ 1003 0079 08        		.byte	8
+ 1004 007a 04        		.byte	4
+ 1005 007b 02        		.byte	2
+ 1006 007c 00        		.byte	0
+ 1007 007d 3E        		.byte	62
+ 1008 007e 51        		.byte	81
+ 1009 007f 49        		.byte	73
+ 1010 0080 45        		.byte	69
+ 1011 0081 3E        		.byte	62
+ 1012 0082 00        		.byte	0
+ 1013 0083 00        		.byte	0
+ 1014 0084 42        		.byte	66
+ 1015 0085 7F        		.byte	127
+ 1016 0086 40        		.byte	64
+ 1017 0087 00        		.byte	0
+ 1018 0088 00        		.byte	0
+ 1019 0089 42        		.byte	66
+ 1020 008a 61        		.byte	97
+ 1021 008b 51        		.byte	81
+ 1022 008c 49        		.byte	73
+ 1023 008d 46        		.byte	70
+ 1024 008e 00        		.byte	0
+ 1025 008f 21        		.byte	33
+ 1026 0090 41        		.byte	65
+ 1027 0091 45        		.byte	69
+ 1028 0092 4B        		.byte	75
+ 1029 0093 31        		.byte	49
+ 1030 0094 00        		.byte	0
+ 1031 0095 18        		.byte	24
+ 1032 0096 14        		.byte	20
+ 1033 0097 12        		.byte	18
+ 1034 0098 7F        		.byte	127
+ 1035 0099 10        		.byte	16
+ 1036 009a 00        		.byte	0
+ 1037 009b 27        		.byte	39
+ 1038 009c 45        		.byte	69
+ 1039 009d 45        		.byte	69
+ 1040 009e 45        		.byte	69
+ 1041 009f 39        		.byte	57
+ 1042 00a0 00        		.byte	0
+ 1043 00a1 3C        		.byte	60
+ 1044 00a2 4A        		.byte	74
+ 1045 00a3 49        		.byte	73
+ 1046 00a4 49        		.byte	73
+ 1047 00a5 30        		.byte	48
+ 1048 00a6 00        		.byte	0
+ 1049 00a7 01        		.byte	1
+ 1050 00a8 71        		.byte	113
+ 1051 00a9 09        		.byte	9
+ 1052 00aa 05        		.byte	5
+ 1053 00ab 03        		.byte	3
+ 1054 00ac 00        		.byte	0
+ 1055 00ad 36        		.byte	54
+ 1056 00ae 49        		.byte	73
+ 1057 00af 49        		.byte	73
+ 1058 00b0 49        		.byte	73
+ 1059 00b1 36        		.byte	54
+ 1060 00b2 00        		.byte	0
+ 1061 00b3 06        		.byte	6
+ 1062 00b4 49        		.byte	73
+ 1063 00b5 49        		.byte	73
+ 1064 00b6 29        		.byte	41
+ 1065 00b7 1E        		.byte	30
+ 1066 00b8 00        		.byte	0
+ 1067 00b9 00        		.byte	0
+ 1068 00ba 36        		.byte	54
+ 1069 00bb 36        		.byte	54
+ 1070 00bc 00        		.byte	0
+ 1071 00bd 00        		.byte	0
+ 1072 00be 00        		.byte	0
+ 1073 00bf 00        		.byte	0
+ 1074 00c0 56        		.byte	86
+ 1075 00c1 36        		.byte	54
+ 1076 00c2 00        		.byte	0
+ 1077 00c3 00        		.byte	0
+ 1078 00c4 00        		.byte	0
+ 1079 00c5 08        		.byte	8
+ 1080 00c6 14        		.byte	20
+ 1081 00c7 22        		.byte	34
+ 1082 00c8 41        		.byte	65
+ 1083 00c9 00        		.byte	0
+ 1084 00ca 00        		.byte	0
+ 1085 00cb 14        		.byte	20
+ 1086 00cc 14        		.byte	20
+ 1087 00cd 14        		.byte	20
+ 1088 00ce 14        		.byte	20
+ 1089 00cf 14        		.byte	20
+ 1090 00d0 00        		.byte	0
+ 1091 00d1 00        		.byte	0
+ 1092 00d2 41        		.byte	65
+ 1093 00d3 22        		.byte	34
+ 1094 00d4 14        		.byte	20
+ 1095 00d5 08        		.byte	8
+ 1096 00d6 00        		.byte	0
+ 1097 00d7 02        		.byte	2
+ 1098 00d8 01        		.byte	1
+ 1099 00d9 51        		.byte	81
+ 1100 00da 09        		.byte	9
+ 1101 00db 06        		.byte	6
+ 1102 00dc 00        		.byte	0
+ 1103 00dd 32        		.byte	50
+ 1104 00de 49        		.byte	73
+ 1105 00df 59        		.byte	89
+ 1106 00e0 51        		.byte	81
+ 1107 00e1 3E        		.byte	62
+ 1108 00e2 00        		.byte	0
+ 1109 00e3 7C        		.byte	124
+ 1110 00e4 12        		.byte	18
+ 1111 00e5 11        		.byte	17
+ 1112 00e6 12        		.byte	18
+ 1113 00e7 7C        		.byte	124
+ 1114 00e8 00        		.byte	0
+ 1115 00e9 7F        		.byte	127
+ 1116 00ea 49        		.byte	73
+ 1117 00eb 49        		.byte	73
+ 1118 00ec 49        		.byte	73
+ 1119 00ed 36        		.byte	54
+ 1120 00ee 00        		.byte	0
+ 1121 00ef 3E        		.byte	62
+ 1122 00f0 41        		.byte	65
+ 1123 00f1 41        		.byte	65
+ 1124 00f2 41        		.byte	65
+ 1125 00f3 22        		.byte	34
+ 1126 00f4 00        		.byte	0
+ 1127 00f5 7F        		.byte	127
+ 1128 00f6 41        		.byte	65
+ 1129 00f7 41        		.byte	65
+ 1130 00f8 22        		.byte	34
+ 1131 00f9 1C        		.byte	28
+ 1132 00fa 00        		.byte	0
+ 1133 00fb 7F        		.byte	127
+ 1134 00fc 49        		.byte	73
+ 1135 00fd 49        		.byte	73
+ 1136 00fe 49        		.byte	73
+ 1137 00ff 41        		.byte	65
+ 1138 0100 00        		.byte	0
+ 1139 0101 7F        		.byte	127
+ 1140 0102 09        		.byte	9
+ 1141 0103 09        		.byte	9
+ 1142 0104 09        		.byte	9
+ 1143 0105 01        		.byte	1
+ 1144 0106 00        		.byte	0
+ 1145 0107 3E        		.byte	62
+ 1146 0108 41        		.byte	65
+ 1147 0109 49        		.byte	73
+ 1148 010a 49        		.byte	73
+ 1149 010b 7A        		.byte	122
+ 1150 010c 00        		.byte	0
+ 1151 010d 7F        		.byte	127
+ 1152 010e 08        		.byte	8
+ 1153 010f 08        		.byte	8
+ 1154 0110 08        		.byte	8
+ 1155 0111 7F        		.byte	127
+ 1156 0112 00        		.byte	0
+ 1157 0113 00        		.byte	0
+ 1158 0114 41        		.byte	65
+ 1159 0115 7F        		.byte	127
+ 1160 0116 41        		.byte	65
+ 1161 0117 00        		.byte	0
+ 1162 0118 00        		.byte	0
+ 1163 0119 20        		.byte	32
+ 1164 011a 40        		.byte	64
+ 1165 011b 41        		.byte	65
+ 1166 011c 3F        		.byte	63
+ 1167 011d 01        		.byte	1
+ 1168 011e 00        		.byte	0
+ 1169 011f 7F        		.byte	127
+ 1170 0120 08        		.byte	8
+ 1171 0121 14        		.byte	20
+ 1172 0122 22        		.byte	34
+ 1173 0123 41        		.byte	65
+ 1174 0124 00        		.byte	0
+ 1175 0125 7F        		.byte	127
+ 1176 0126 40        		.byte	64
+ 1177 0127 40        		.byte	64
+ 1178 0128 40        		.byte	64
+ 1179 0129 40        		.byte	64
+ 1180 012a 00        		.byte	0
+ 1181 012b 7F        		.byte	127
+ 1182 012c 02        		.byte	2
+ 1183 012d 0C        		.byte	12
+ 1184 012e 02        		.byte	2
+ 1185 012f 7F        		.byte	127
+ 1186 0130 00        		.byte	0
+ 1187 0131 7F        		.byte	127
+ 1188 0132 04        		.byte	4
+ 1189 0133 08        		.byte	8
+ 1190 0134 10        		.byte	16
+ 1191 0135 7F        		.byte	127
+ 1192 0136 00        		.byte	0
+ 1193 0137 3E        		.byte	62
+ 1194 0138 41        		.byte	65
+ 1195 0139 41        		.byte	65
+ 1196 013a 41        		.byte	65
+ 1197 013b 3E        		.byte	62
+ 1198 013c 00        		.byte	0
+ 1199 013d 7F        		.byte	127
+ 1200 013e 09        		.byte	9
+ 1201 013f 09        		.byte	9
+ 1202 0140 09        		.byte	9
+ 1203 0141 06        		.byte	6
+ 1204 0142 00        		.byte	0
+ 1205 0143 3E        		.byte	62
+ 1206 0144 41        		.byte	65
+ 1207 0145 51        		.byte	81
+ 1208 0146 21        		.byte	33
+ 1209 0147 5E        		.byte	94
+ 1210 0148 00        		.byte	0
+ 1211 0149 7F        		.byte	127
+ 1212 014a 09        		.byte	9
+ 1213 014b 19        		.byte	25
+ 1214 014c 29        		.byte	41
+ 1215 014d 46        		.byte	70
+ 1216 014e 00        		.byte	0
+ 1217 014f 46        		.byte	70
+ 1218 0150 49        		.byte	73
+ 1219 0151 49        		.byte	73
+ 1220 0152 49        		.byte	73
+ 1221 0153 31        		.byte	49
+ 1222 0154 00        		.byte	0
+ 1223 0155 01        		.byte	1
+ 1224 0156 01        		.byte	1
+ 1225 0157 7F        		.byte	127
+ 1226 0158 01        		.byte	1
+ 1227 0159 01        		.byte	1
+ 1228 015a 00        		.byte	0
+ 1229 015b 3F        		.byte	63
+ 1230 015c 40        		.byte	64
+ 1231 015d 40        		.byte	64
+ 1232 015e 40        		.byte	64
+ 1233 015f 3F        		.byte	63
+ 1234 0160 00        		.byte	0
+ 1235 0161 1F        		.byte	31
+ 1236 0162 20        		.byte	32
+ 1237 0163 40        		.byte	64
+ 1238 0164 20        		.byte	32
+ 1239 0165 1F        		.byte	31
+ 1240 0166 00        		.byte	0
+ 1241 0167 3F        		.byte	63
+ 1242 0168 40        		.byte	64
+ 1243 0169 38        		.byte	56
+ 1244 016a 40        		.byte	64
+ 1245 016b 3F        		.byte	63
+ 1246 016c 00        		.byte	0
+ 1247 016d 63        		.byte	99
+ 1248 016e 14        		.byte	20
+ 1249 016f 08        		.byte	8
+ 1250 0170 14        		.byte	20
+ 1251 0171 63        		.byte	99
+ 1252 0172 00        		.byte	0
+ 1253 0173 07        		.byte	7
+ 1254 0174 08        		.byte	8
+ 1255 0175 70        		.byte	112
+ 1256 0176 08        		.byte	8
+ 1257 0177 07        		.byte	7
+ 1258 0178 00        		.byte	0
+ 1259 0179 61        		.byte	97
+ 1260 017a 51        		.byte	81
+ 1261 017b 49        		.byte	73
+ 1262 017c 45        		.byte	69
+ 1263 017d 43        		.byte	67
+ 1264 017e 00        		.byte	0
+ 1265 017f 00        		.byte	0
+ 1266 0180 7F        		.byte	127
+ 1267 0181 41        		.byte	65
+ 1268 0182 41        		.byte	65
+ 1269 0183 00        		.byte	0
+ 1270 0184 00        		.byte	0
+ 1271 0185 55        		.byte	85
+ 1272 0186 2A        		.byte	42
+ 1273 0187 55        		.byte	85
+ 1274 0188 2A        		.byte	42
+ 1275 0189 55        		.byte	85
+ 1276 018a 00        		.byte	0
+ 1277 018b 00        		.byte	0
+ 1278 018c 41        		.byte	65
+ 1279 018d 41        		.byte	65
+ 1280 018e 7F        		.byte	127
+ 1281 018f 00        		.byte	0
+ 1282 0190 00        		.byte	0
+ 1283 0191 04        		.byte	4
+ 1284 0192 02        		.byte	2
+ 1285 0193 01        		.byte	1
+ 1286 0194 02        		.byte	2
+ 1287 0195 04        		.byte	4
+ 1288 0196 00        		.byte	0
+ 1289 0197 40        		.byte	64
+ 1290 0198 40        		.byte	64
+ 1291 0199 40        		.byte	64
+ 1292 019a 40        		.byte	64
+ 1293 019b 40        		.byte	64
+ 1294 019c 00        		.byte	0
+ 1295 019d 00        		.byte	0
+ 1296 019e 01        		.byte	1
+ 1297 019f 02        		.byte	2
+ 1298 01a0 04        		.byte	4
+ 1299 01a1 00        		.byte	0
+ 1300 01a2 00        		.byte	0
+ 1301 01a3 20        		.byte	32
+ 1302 01a4 54        		.byte	84
+ 1303 01a5 54        		.byte	84
+ 1304 01a6 54        		.byte	84
+ 1305 01a7 78        		.byte	120
+ 1306 01a8 00        		.byte	0
+ 1307 01a9 7F        		.byte	127
+ 1308 01aa 48        		.byte	72
+ 1309 01ab 44        		.byte	68
+ 1310 01ac 44        		.byte	68
+ 1311 01ad 38        		.byte	56
+ 1312 01ae 00        		.byte	0
+ 1313 01af 38        		.byte	56
+ 1314 01b0 44        		.byte	68
+ 1315 01b1 44        		.byte	68
+ 1316 01b2 44        		.byte	68
+ 1317 01b3 20        		.byte	32
+ 1318 01b4 00        		.byte	0
+ 1319 01b5 38        		.byte	56
+ 1320 01b6 44        		.byte	68
+ 1321 01b7 44        		.byte	68
+ 1322 01b8 48        		.byte	72
+ 1323 01b9 7F        		.byte	127
+ 1324 01ba 00        		.byte	0
+ 1325 01bb 38        		.byte	56
+ 1326 01bc 54        		.byte	84
+ 1327 01bd 54        		.byte	84
+ 1328 01be 54        		.byte	84
+ 1329 01bf 18        		.byte	24
+ 1330 01c0 00        		.byte	0
+ 1331 01c1 08        		.byte	8
+ 1332 01c2 7E        		.byte	126
+ 1333 01c3 09        		.byte	9
+ 1334 01c4 01        		.byte	1
+ 1335 01c5 02        		.byte	2
+ 1336 01c6 00        		.byte	0
+ 1337 01c7 18        		.byte	24
+ 1338 01c8 A4        		.byte	-92
+ 1339 01c9 A4        		.byte	-92
+ 1340 01ca A4        		.byte	-92
+ 1341 01cb 7C        		.byte	124
+ 1342 01cc 00        		.byte	0
+ 1343 01cd 7F        		.byte	127
+ 1344 01ce 08        		.byte	8
+ 1345 01cf 04        		.byte	4
+ 1346 01d0 04        		.byte	4
+ 1347 01d1 78        		.byte	120
+ 1348 01d2 00        		.byte	0
+ 1349 01d3 00        		.byte	0
+ 1350 01d4 44        		.byte	68
+ 1351 01d5 7D        		.byte	125
+ 1352 01d6 40        		.byte	64
+ 1353 01d7 00        		.byte	0
+ 1354 01d8 00        		.byte	0
+ 1355 01d9 40        		.byte	64
+ 1356 01da 80        		.byte	-128
+ 1357 01db 84        		.byte	-124
+ 1358 01dc 7D        		.byte	125
+ 1359 01dd 00        		.byte	0
+ 1360 01de 00        		.byte	0
+ 1361 01df 7F        		.byte	127
+ 1362 01e0 10        		.byte	16
+ 1363 01e1 28        		.byte	40
+ 1364 01e2 44        		.byte	68
+ 1365 01e3 00        		.byte	0
+ 1366 01e4 00        		.byte	0
+ 1367 01e5 00        		.byte	0
+ 1368 01e6 41        		.byte	65
+ 1369 01e7 7F        		.byte	127
+ 1370 01e8 40        		.byte	64
+ 1371 01e9 00        		.byte	0
+ 1372 01ea 00        		.byte	0
+ 1373 01eb 7C        		.byte	124
+ 1374 01ec 04        		.byte	4
+ 1375 01ed 18        		.byte	24
+ 1376 01ee 04        		.byte	4
+ 1377 01ef 78        		.byte	120
+ 1378 01f0 00        		.byte	0
+ 1379 01f1 7C        		.byte	124
+ 1380 01f2 08        		.byte	8
+ 1381 01f3 04        		.byte	4
+ 1382 01f4 04        		.byte	4
+ 1383 01f5 78        		.byte	120
+ 1384 01f6 00        		.byte	0
+ 1385 01f7 38        		.byte	56
+ 1386 01f8 44        		.byte	68
+ 1387 01f9 44        		.byte	68
+ 1388 01fa 44        		.byte	68
+ 1389 01fb 38        		.byte	56
+ 1390 01fc 00        		.byte	0
+ 1391 01fd FC        		.byte	-4
+ 1392 01fe 24        		.byte	36
+ 1393 01ff 24        		.byte	36
+ 1394 0200 24        		.byte	36
+ 1395 0201 18        		.byte	24
+ 1396 0202 00        		.byte	0
+ 1397 0203 18        		.byte	24
+ 1398 0204 24        		.byte	36
+ 1399 0205 24        		.byte	36
+ 1400 0206 18        		.byte	24
+ 1401 0207 FC        		.byte	-4
+ 1402 0208 00        		.byte	0
+ 1403 0209 7C        		.byte	124
+ 1404 020a 08        		.byte	8
+ 1405 020b 04        		.byte	4
+ 1406 020c 04        		.byte	4
+ 1407 020d 08        		.byte	8
+ 1408 020e 00        		.byte	0
+ 1409 020f 48        		.byte	72
+ 1410 0210 54        		.byte	84
+ 1411 0211 54        		.byte	84
+ 1412 0212 54        		.byte	84
+ 1413 0213 20        		.byte	32
+ 1414 0214 00        		.byte	0
+ 1415 0215 04        		.byte	4
+ 1416 0216 3F        		.byte	63
+ 1417 0217 44        		.byte	68
+ 1418 0218 40        		.byte	64
+ 1419 0219 20        		.byte	32
+ 1420 021a 00        		.byte	0
+ 1421 021b 3C        		.byte	60
+ 1422 021c 40        		.byte	64
+ 1423 021d 40        		.byte	64
+ 1424 021e 20        		.byte	32
+ 1425 021f 7C        		.byte	124
+ 1426 0220 00        		.byte	0
+ 1427 0221 1C        		.byte	28
+ 1428 0222 20        		.byte	32
+ 1429 0223 40        		.byte	64
+ 1430 0224 20        		.byte	32
+ 1431 0225 1C        		.byte	28
+ 1432 0226 00        		.byte	0
+ 1433 0227 3C        		.byte	60
+ 1434 0228 40        		.byte	64
+ 1435 0229 30        		.byte	48
+ 1436 022a 40        		.byte	64
+ 1437 022b 3C        		.byte	60
+ 1438 022c 00        		.byte	0
+ 1439 022d 44        		.byte	68
+ 1440 022e 28        		.byte	40
+ 1441 022f 10        		.byte	16
+ 1442 0230 28        		.byte	40
+ 1443 0231 44        		.byte	68
+ 1444 0232 00        		.byte	0
+ 1445 0233 1C        		.byte	28
+ 1446 0234 A0        		.byte	-96
+ 1447 0235 A0        		.byte	-96
+ 1448 0236 A0        		.byte	-96
+ 1449 0237 7C        		.byte	124
+ 1450 0238 00        		.byte	0
+ 1451 0239 44        		.byte	68
+ 1452 023a 64        		.byte	100
+ 1453 023b 54        		.byte	84
+ 1454 023c 4C        		.byte	76
+ 1455 023d 44        		.byte	68
+ 1456 023e 14        		.byte	20
+ 1457 023f 14        		.byte	20
+ 1458 0240 14        		.byte	20
+ 1459 0241 14        		.byte	20
+ 1460 0242 14        		.byte	20
+ 1461 0243 14        		.byte	20
+ 1462               		.text
+ 1463               	.Letext0:
+ 1464               		.file 2 "/usr/local/Cellar/avr-gcc/4.9.2/avr/include/stdint.h"
+ 1465               		.file 3 "lib/ssd1306xled/font6x8.h"
+ 1466               		.file 4 "lib/ssd1306xled/num2str.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 ssd1306xled.c
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:5      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:6      *ABS*:0000000000000001 __zero_reg__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:12     .text:0000000000000000 ssd1306_xfer_start
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:35     .text:000000000000000a ssd1306_xfer_stop
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:57     .text:0000000000000014 ssd1306_send_byte
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:114    .text:0000000000000046 ssd1306_send_command_start
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:138    .text:0000000000000050 ssd1306_send_command_stop
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:154    .text:0000000000000052 ssd1306_send_command
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:203    .text:000000000000006c ssd1306_send_data_start
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:227    .text:0000000000000076 ssd1306_send_data_stop
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:243    .text:0000000000000078 ssd1306_init
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:877    .progmem.data:0000000000000000 ssd1306_init_sequence
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:306    .text:000000000000009e ssd1306_setpos
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:376    .text:00000000000000d2 ssd1306_fillp
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:452    .text:0000000000000100 ssd1306_fill
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:470    .text:0000000000000104 ssd1306_flip
+                             .bss:0000000000000000 flipped.1915
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:514    .text:000000000000012a ssd1306_char_font6x8
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:909    .progmem.data:000000000000001c ssd1306xled_font6x8
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:624    .text:000000000000017e ssd1306_string_font6x8
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:667    .text:0000000000000194 ssd1306_numdec_font6x8
+                            *COM*:0000000000000006 ssd1306_numdec_buffer
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:695    .text:00000000000001a6 ssd1306_numdecp_font6x8
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccdVqhhT.s:721    .text:00000000000001b6 ssd1306_draw_bmp
+
+UNDEFINED SYMBOLS
+__mulhi3
+usint2decascii
+__do_clear_bss

@@ -1,0 +1,3 @@
+lib/TWIBB/TWIBB.o: lib/TWIBB/TWIBB.c lib/TWIBB/TWIBB.h
+
+lib/TWIBB/TWIBB.h:

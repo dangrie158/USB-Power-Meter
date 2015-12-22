@@ -1,0 +1,1093 @@
+   1               		.file	"TM1637Display.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	TM1637DisplayBitDelay
+  12               	TM1637DisplayBitDelay:
+  13               	.LFB10:
+  14               		.file 1 "lib/TM1637/TM1637Display.c"
+   1:lib/TM1637/TM1637Display.c **** #include <stdlib.h>
+   2:lib/TM1637/TM1637Display.c **** #include <string.h>
+   3:lib/TM1637/TM1637Display.c **** #include <inttypes.h>
+   4:lib/TM1637/TM1637Display.c **** #include <util/delay.h>
+   5:lib/TM1637/TM1637Display.c **** #include <avr/io.h>
+   6:lib/TM1637/TM1637Display.c **** 
+   7:lib/TM1637/TM1637Display.c **** 
+   8:lib/TM1637/TM1637Display.c **** #include "TM1637Display.h"
+   9:lib/TM1637/TM1637Display.c **** 
+  10:lib/TM1637/TM1637Display.c **** #define TM1637_I2C_COMM1    0x40
+  11:lib/TM1637/TM1637Display.c **** #define TM1637_I2C_COMM2    0xC0
+  12:lib/TM1637/TM1637Display.c **** #define TM1637_I2C_COMM3    0x80
+  13:lib/TM1637/TM1637Display.c **** 
+  14:lib/TM1637/TM1637Display.c **** //
+  15:lib/TM1637/TM1637Display.c **** //      A
+  16:lib/TM1637/TM1637Display.c **** //     ---
+  17:lib/TM1637/TM1637Display.c **** //  F |   | B
+  18:lib/TM1637/TM1637Display.c **** //     -G-
+  19:lib/TM1637/TM1637Display.c **** //  E |   | C
+  20:lib/TM1637/TM1637Display.c **** //     ---
+  21:lib/TM1637/TM1637Display.c **** //      D
+  22:lib/TM1637/TM1637Display.c **** 
+  23:lib/TM1637/TM1637Display.c **** uint8_t m_brightness;
+  24:lib/TM1637/TM1637Display.c **** 
+  25:lib/TM1637/TM1637Display.c **** const uint8_t digitToSegment[] = {
+  26:lib/TM1637/TM1637Display.c ****  // XGFEDCBA
+  27:lib/TM1637/TM1637Display.c ****   0b00111111,    // 0
+  28:lib/TM1637/TM1637Display.c ****   0b00000110,    // 1
+  29:lib/TM1637/TM1637Display.c ****   0b01011011,    // 2
+  30:lib/TM1637/TM1637Display.c ****   0b01001111,    // 3
+  31:lib/TM1637/TM1637Display.c ****   0b01100110,    // 4
+  32:lib/TM1637/TM1637Display.c ****   0b01101101,    // 5
+  33:lib/TM1637/TM1637Display.c ****   0b01111101,    // 6
+  34:lib/TM1637/TM1637Display.c ****   0b00000111,    // 7
+  35:lib/TM1637/TM1637Display.c ****   0b01111111,    // 8
+  36:lib/TM1637/TM1637Display.c ****   0b01101111,    // 9
+  37:lib/TM1637/TM1637Display.c ****   0b01110111,    // A
+  38:lib/TM1637/TM1637Display.c ****   0b01111100,    // b
+  39:lib/TM1637/TM1637Display.c ****   0b00111001,    // C
+  40:lib/TM1637/TM1637Display.c ****   0b01011110,    // d
+  41:lib/TM1637/TM1637Display.c ****   0b01111001,    // E
+  42:lib/TM1637/TM1637Display.c ****   0b01110001     // F
+  43:lib/TM1637/TM1637Display.c ****   };
+  44:lib/TM1637/TM1637Display.c **** 
+  45:lib/TM1637/TM1637Display.c **** void TM1637DisplayBitDelay()
+  46:lib/TM1637/TM1637Display.c **** {
+  15               		.loc 1 46 0
+  16               		.cfi_startproc
+  17               	/* prologue: function */
+  18               	/* frame size = 0 */
+  19               	/* stack size = 0 */
+  20               	.L__stack_usage = 0
+  21               	.LVL0:
+  22               	.LBB55:
+  23               	.LBB56:
+  24               		.file 2 "/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h"
+   1:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /* Copyright (c) 2002, Marek Michalkiewicz
+   2:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Copyright (c) 2004,2005,2007 Joerg Wunsch
+   3:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Copyright (c) 2007  Florin-Viorel Petrov
+   4:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    All rights reserved.
+   5:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+   6:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Redistribution and use in source and binary forms, with or without
+   7:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    modification, are permitted provided that the following conditions are met:
+   8:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+   9:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    * Redistributions of source code must retain the above copyright
+  10:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer.
+  11:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  12:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    * Redistributions in binary form must reproduce the above copyright
+  13:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer in
+  14:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      the documentation and/or other materials provided with the
+  15:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      distribution.
+  16:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  17:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    * Neither the name of the copyright holders nor the names of
+  18:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      contributors may be used to endorse or promote products derived
+  19:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      from this software without specific prior written permission.
+  20:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  21:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  23:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  25:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   POSSIBILITY OF SUCH DAMAGE. */
+  32:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  33:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /* $Id: delay.h.in 2385 2013-05-03 13:14:20Z joerg_wunsch $ */
+  34:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  35:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #ifndef _UTIL_DELAY_H_
+  36:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #define _UTIL_DELAY_H_ 1
+  37:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  38:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #ifndef __HAS_DELAY_CYCLES
+  39:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #define __HAS_DELAY_CYCLES 1
+  40:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+  41:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  42:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #include <inttypes.h>
+  43:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #include <util/delay_basic.h>
+  44:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #include <math.h>
+  45:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  46:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /** \file */
+  47:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /** \defgroup util_delay <util/delay.h>: Convenience functions for busy-wait delay loops
+  48:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     \code
+  49:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     #define F_CPU 1000000UL  // 1 MHz
+  50:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     //#define F_CPU 14.7456E6
+  51:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     #include <util/delay.h>
+  52:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     \endcode
+  53:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  54:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     \note As an alternative method, it is possible to pass the
+  55:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     F_CPU macro down to the compiler from the Makefile.
+  56:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     Obviously, in that case, no \c \#define statement should be
+  57:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     used.
+  58:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  59:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     The functions in this header file are wrappers around the basic
+  60:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     busy-wait functions from <util/delay_basic.h>.  They are meant as
+  61:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     convenience functions where actual time values can be specified
+  62:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     rather than a number of cycles to wait for.  The idea behind is
+  63:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     that compile-time constant expressions will be eliminated by
+  64:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     compiler optimization so floating-point expressions can be used
+  65:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     to calculate the number of delay cycles needed based on the CPU
+  66:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     frequency passed by the macro F_CPU.
+  67:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  68:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     \note In order for these functions to work as intended, compiler
+  69:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     optimizations <em>must</em> be enabled, and the delay time
+  70:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     <em>must</em> be an expression that is a known constant at
+  71:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     compile-time.  If these requirements are not met, the resulting
+  72:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     delay will be much longer (and basically unpredictable), and
+  73:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     applications that otherwise do not use floating-point calculations
+  74:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     will experience severe code bloat by the floating-point library
+  75:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     routines linked into the application.
+  76:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  77:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     The functions available allow the specification of microsecond, and
+  78:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     millisecond delays directly, using the application-supplied macro
+  79:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     F_CPU as the CPU clock frequency (in Hertz).
+  80:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  81:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** */
+  82:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  83:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #if !defined(__DOXYGEN__)
+  84:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** static inline void _delay_us(double __us) __attribute__((always_inline));
+  85:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** static inline void _delay_ms(double __ms) __attribute__((always_inline));
+  86:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+  87:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  88:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #ifndef F_CPU
+  89:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /* prevent compiler error by supplying a default */
+  90:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** # warning "F_CPU not defined for <util/delay.h>"
+  91:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** # define F_CPU 1000000UL
+  92:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+  93:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  94:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #ifndef __OPTIMIZE__
+  95:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** # warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+  96:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+  97:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  98:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+  99:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 100:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 101:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #  include <math.h>
+ 102:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+ 103:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 104:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /**
+ 105:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    \ingroup util_delay
+ 106:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 107:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Perform a delay of \c __ms milliseconds, using _delay_loop_2().
+ 108:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 109:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    The macro F_CPU is supposed to be defined to a
+ 110:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 111:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 112:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    The maximal possible delay is 262.14 ms / F_CPU in MHz.
+ 113:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 114:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    When the user request delay which exceed the maximum possible one,
+ 115:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    _delay_ms() provides a decreased resolution functionality. In this
+ 116:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    mode _delay_ms() will work with a resolution of 1/10 ms, providing
+ 117:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    delays up to 6.5535 seconds (independent from CPU frequency).  The
+ 118:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    user will not be informed about decreased resolution.
+ 119:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 120:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles(unsigned long)
+ 121:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    support, maximal possible delay is 4294967.295 ms/ F_CPU in MHz. For
+ 122:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    values greater than the maximal possible delay, overflows results in
+ 123:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    no delay i.e., 0ms.
+ 124:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 125:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Conversion of __us into clock cycles may not always result in integer.
+ 126:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    By default, the clock cycles rounded up to next integer. This ensures that
+ 127:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    the user gets atleast __us microseconds of delay.
+ 128:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 129:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Alternatively, user can define __DELAY_ROUND_DOWN__ and __DELAY_ROUND_CLOSEST__
+ 130:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    to round down and round to closest integer.
+ 131:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 132:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Note: The new implementation of _delay_ms(double __ms) with 
+ 133:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     __builtin_avr_delay_cycles(unsigned long) support is not backward compatible. 
+ 134:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    User can define __DELAY_BACKWARD_COMPATIBLE__ to get a backward compatible delay.
+ 135:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Also, the backward compatible
+ 136:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    algorithm will be chosen if the code is compiled in a <em>freestanding
+ 137:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    environment</em> (GCC option \c -ffreestanding), as the math functions
+ 138:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    required for rounding are not available to the compiler then.
+ 139:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 140:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****  */
+ 141:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** void
+ 142:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** _delay_ms(double __ms)
+ 143:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** {
+ 144:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	double __tmp ; 
+ 145:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 146:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 147:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 148:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	uint32_t __ticks_dc;
+ 149:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 150:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 151:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 152:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 153:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)fabs(__tmp);
+ 154:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 155:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 156:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(fabs(__tmp)+0.5);
+ 157:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 158:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#else
+ 159:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		//round up by default
+ 160:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+ 161:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#endif
+ 162:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 163:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+ 164:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 165:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #else
+ 166:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	uint16_t __ticks;
+ 167:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 4e3) * __ms;
+ 168:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	if (__tmp < 1.0)
+ 169:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks = 1;
+ 170:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	else if (__tmp > 65535)
+ 171:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	{
+ 172:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		//	__ticks = requested delay in 1/10 ms
+ 173:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks = (uint16_t) (__ms * 10.0);
+ 174:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		while(__ticks)
+ 175:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		{
+ 176:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 			// wait 1/10 ms
+ 177:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 			_delay_loop_2(((F_CPU) / 4e3) / 10);
+ 178:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 			__ticks --;
+ 179:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		}
+ 180:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		return;
+ 181:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	}
+ 182:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	else
+ 183:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks = (uint16_t)__tmp;
+ 184:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	_delay_loop_2(__ticks);
+ 185:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+ 186:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** }
+ 187:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 188:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /**
+ 189:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    \ingroup util_delay
+ 190:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 191:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Perform a delay of \c __us microseconds, using _delay_loop_1().
+ 192:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 193:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    The macro F_CPU is supposed to be defined to a
+ 194:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 195:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 196:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    The maximal possible delay is 768 us / F_CPU in MHz.
+ 197:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 198:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    If the user requests a delay greater than the maximal possible one,
+ 199:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    _delay_us() will automatically call _delay_ms() instead.  The user
+ 200:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    will not be informed about this case.
+ 201:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 202:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles(unsigned long)
+ 203:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    support, maximal possible delay is 4294967.295 us/ F_CPU in MHz. For
+ 204:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    values greater than the maximal possible delay, overflow results in
+ 205:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    no delay i.e., 0us.
+ 206:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   
+ 207:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Conversion of __us into clock cycles may not always result in integer.
+ 208:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    By default, the clock cycles rounded up to next integer. This ensures that
+ 209:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    the user gets atleast __us microseconds of delay.
+ 210:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 211:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Alternatively, user can define __DELAY_ROUND_DOWN__ and __DELAY_ROUND_CLOSEST__
+ 212:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    to round down and round to closest integer.
+ 213:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****  
+ 214:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Note: The new implementation of _delay_us(double __us) with 
+ 215:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     __builtin_avr_delay_cycles(unsigned long) support is not backward compatible.
+ 216:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    User can define __DELAY_BACKWARD_COMPATIBLE__ to get a backward compatible delay.
+ 217:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Also, the backward compatible
+ 218:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    algorithm will be chosen if the code is compiled in a <em>freestanding
+ 219:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    environment</em> (GCC option \c -ffreestanding), as the math functions
+ 220:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    required for rounding are not available to the compiler then.
+ 221:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 222:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****  */
+ 223:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** void
+ 224:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** _delay_us(double __us)
+ 225:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** {
+ 226:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	double __tmp ; 
+ 227:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 228:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 229:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 230:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	uint32_t __ticks_dc;
+ 231:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 232:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 1e6) * __us;
+ 233:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 234:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 235:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)fabs(__tmp);
+ 236:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 237:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 238:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(fabs(__tmp)+0.5);
+ 239:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 240:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#else
+ 241:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		//round up by default
+ 242:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+ 243:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#endif
+ 244:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 245:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+  25               		.loc 2 245 0
+  26 0000 80E1      		ldi r24,lo8(16)
+  27 0002 8A95      		1: dec r24
+  28 0004 01F4      		brne 1b
+  29 0006 00C0      		rjmp .
+  30 0008 0895      		ret
+  31               	.LBE56:
+  32               	.LBE55:
+  33               		.cfi_endproc
+  34               	.LFE10:
+  36               	.global	TM1637DisplayStart
+  38               	TM1637DisplayStart:
+  39               	.LFB11:
+  47:lib/TM1637/TM1637Display.c **** 	_delay_us(50);
+  48:lib/TM1637/TM1637Display.c **** }
+  49:lib/TM1637/TM1637Display.c ****    
+  50:lib/TM1637/TM1637Display.c **** void TM1637DisplayStart()
+  51:lib/TM1637/TM1637Display.c **** {
+  40               		.loc 1 51 0
+  41               		.cfi_startproc
+  42               	/* prologue: function */
+  43               	/* frame size = 0 */
+  44               	/* stack size = 0 */
+  45               	.L__stack_usage = 0
+  52:lib/TM1637/TM1637Display.c ****   DDRB |= 1 << PB0;
+  46               		.loc 1 52 0
+  47 000a B89A      		sbi 0x17,0
+  48               	.LVL1:
+  49               	.LBB57:
+  50               	.LBB58:
+  51               	.LBB59:
+  52               		.loc 2 245 0
+  53 000c 80E1      		ldi r24,lo8(16)
+  54 000e 8A95      		1: dec r24
+  55 0010 01F4      		brne 1b
+  56 0012 00C0      		rjmp .
+  57 0014 0895      		ret
+  58               	.LBE59:
+  59               	.LBE58:
+  60               	.LBE57:
+  61               		.cfi_endproc
+  62               	.LFE11:
+  64               	.global	TM1637DisplayStop
+  66               	TM1637DisplayStop:
+  67               	.LFB12:
+  53:lib/TM1637/TM1637Display.c ****   TM1637DisplayBitDelay();
+  54:lib/TM1637/TM1637Display.c **** }
+  55:lib/TM1637/TM1637Display.c ****    
+  56:lib/TM1637/TM1637Display.c **** void TM1637DisplayStop()
+  57:lib/TM1637/TM1637Display.c **** {
+  68               		.loc 1 57 0
+  69               		.cfi_startproc
+  70               	/* prologue: function */
+  71               	/* frame size = 0 */
+  72               	/* stack size = 0 */
+  73               	.L__stack_usage = 0
+  58:lib/TM1637/TM1637Display.c **** 	DDRB |= 1 << PB0;
+  74               		.loc 1 58 0
+  75 0016 B89A      		sbi 0x17,0
+  76               	.LVL2:
+  77               	.LBB60:
+  78               	.LBB61:
+  79               	.LBB62:
+  80               		.loc 2 245 0
+  81 0018 80E1      		ldi r24,lo8(16)
+  82 001a 8A95      		1: dec r24
+  83 001c 01F4      		brne 1b
+  84 001e 00C0      		rjmp .
+  85               	.LBE62:
+  86               	.LBE61:
+  87               	.LBE60:
+  59:lib/TM1637/TM1637Display.c **** 	TM1637DisplayBitDelay();
+  60:lib/TM1637/TM1637Display.c **** 	DDRB &= ~(1 << PB2);
+  88               		.loc 1 60 0
+  89 0020 BA98      		cbi 0x17,2
+  90               	.LVL3:
+  91               	.LBB63:
+  92               	.LBB64:
+  93               	.LBB65:
+  94               		.loc 2 245 0
+  95 0022 80E1      		ldi r24,lo8(16)
+  96 0024 8A95      		1: dec r24
+  97 0026 01F4      		brne 1b
+  98 0028 00C0      		rjmp .
+  99               	.LBE65:
+ 100               	.LBE64:
+ 101               	.LBE63:
+  61:lib/TM1637/TM1637Display.c **** 	TM1637DisplayBitDelay();
+  62:lib/TM1637/TM1637Display.c **** 	DDRB &= ~(1 << PB0);
+ 102               		.loc 1 62 0
+ 103 002a B898      		cbi 0x17,0
+ 104               	.LVL4:
+ 105               	.LBB66:
+ 106               	.LBB67:
+ 107               	.LBB68:
+ 108               		.loc 2 245 0
+ 109 002c 80E1      		ldi r24,lo8(16)
+ 110 002e 8A95      		1: dec r24
+ 111 0030 01F4      		brne 1b
+ 112 0032 00C0      		rjmp .
+ 113 0034 0895      		ret
+ 114               	.LBE68:
+ 115               	.LBE67:
+ 116               	.LBE66:
+ 117               		.cfi_endproc
+ 118               	.LFE12:
+ 120               	.global	TM1637DisplayWriteByte
+ 122               	TM1637DisplayWriteByte:
+ 123               	.LFB13:
+  63:lib/TM1637/TM1637Display.c **** 	TM1637DisplayBitDelay();
+  64:lib/TM1637/TM1637Display.c **** }
+  65:lib/TM1637/TM1637Display.c ****   
+  66:lib/TM1637/TM1637Display.c **** bool TM1637DisplayWriteByte(uint8_t b)
+  67:lib/TM1637/TM1637Display.c **** {
+ 124               		.loc 1 67 0
+ 125               		.cfi_startproc
+ 126               	.LVL5:
+ 127               	/* prologue: function */
+ 128               	/* frame size = 0 */
+ 129               	/* stack size = 0 */
+ 130               	.L__stack_usage = 0
+ 131               		.loc 1 67 0
+ 132 0036 98E0      		ldi r25,lo8(8)
+ 133               	.LVL6:
+ 134               	.L7:
+ 135               	.LBB69:
+  68:lib/TM1637/TM1637Display.c ****   uint8_t data = b;
+  69:lib/TM1637/TM1637Display.c **** 
+  70:lib/TM1637/TM1637Display.c ****   // 8 Data Bits
+  71:lib/TM1637/TM1637Display.c ****   for(uint8_t i = 0; i < 8; i++) {
+  72:lib/TM1637/TM1637Display.c ****     // CLK low
+  73:lib/TM1637/TM1637Display.c ****     DDRB |= 1 << PB2;
+ 136               		.loc 1 73 0
+ 137 0038 BA9A      		sbi 0x17,2
+ 138               	.LVL7:
+ 139               	.LBB70:
+ 140               	.LBB71:
+ 141               	.LBB72:
+ 142               		.loc 2 245 0
+ 143 003a 20E1      		ldi r18,lo8(16)
+ 144 003c 2A95      		1: dec r18
+ 145 003e 01F4      		brne 1b
+ 146 0040 00C0      		rjmp .
+ 147               	.LBE72:
+ 148               	.LBE71:
+ 149               	.LBE70:
+  74:lib/TM1637/TM1637Display.c ****     TM1637DisplayBitDelay();
+  75:lib/TM1637/TM1637Display.c ****     
+  76:lib/TM1637/TM1637Display.c **** 	// Set data bit
+  77:lib/TM1637/TM1637Display.c ****     if (data & 0x01)
+ 150               		.loc 1 77 0
+ 151 0042 80FF      		sbrs r24,0
+ 152 0044 00C0      		rjmp .L5
+  78:lib/TM1637/TM1637Display.c ****       DDRB &= ~(1 << PB0);
+ 153               		.loc 1 78 0
+ 154 0046 B898      		cbi 0x17,0
+ 155 0048 00C0      		rjmp .L6
+ 156               	.L5:
+  79:lib/TM1637/TM1637Display.c ****     else
+  80:lib/TM1637/TM1637Display.c ****       DDRB |= 1 << PB0;
+ 157               		.loc 1 80 0
+ 158 004a B89A      		sbi 0x17,0
+ 159               	.L6:
+ 160               	.LVL8:
+ 161               	.LBB73:
+ 162               	.LBB74:
+ 163               	.LBB75:
+ 164               		.loc 2 245 0 discriminator 2
+ 165 004c 20E1      		ldi r18,lo8(16)
+ 166 004e 2A95      		1: dec r18
+ 167 0050 01F4      		brne 1b
+ 168 0052 00C0      		rjmp .
+ 169               	.LBE75:
+ 170               	.LBE74:
+ 171               	.LBE73:
+  81:lib/TM1637/TM1637Display.c ****     
+  82:lib/TM1637/TM1637Display.c ****     TM1637DisplayBitDelay();
+  83:lib/TM1637/TM1637Display.c **** 	
+  84:lib/TM1637/TM1637Display.c **** 	// CLK high
+  85:lib/TM1637/TM1637Display.c ****     DDRB &= ~(1 << PB2);
+ 172               		.loc 1 85 0 discriminator 2
+ 173 0054 BA98      		cbi 0x17,2
+ 174               	.LVL9:
+ 175               	.LBB76:
+ 176               	.LBB77:
+ 177               	.LBB78:
+ 178               		.loc 2 245 0 discriminator 2
+ 179 0056 20E1      		ldi r18,lo8(16)
+ 180 0058 2A95      		1: dec r18
+ 181 005a 01F4      		brne 1b
+ 182 005c 00C0      		rjmp .
+ 183               	.LBE78:
+ 184               	.LBE77:
+ 185               	.LBE76:
+  86:lib/TM1637/TM1637Display.c ****     TM1637DisplayBitDelay();
+  87:lib/TM1637/TM1637Display.c ****     data = data >> 1;
+ 186               		.loc 1 87 0 discriminator 2
+ 187 005e 8695      		lsr r24
+ 188               	.LVL10:
+ 189 0060 9150      		subi r25,lo8(-(-1))
+ 190               	.LVL11:
+  71:lib/TM1637/TM1637Display.c ****     // CLK low
+ 191               		.loc 1 71 0 discriminator 2
+ 192 0062 01F4      		brne .L7
+ 193               	.LBE69:
+  88:lib/TM1637/TM1637Display.c ****   }
+  89:lib/TM1637/TM1637Display.c ****   
+  90:lib/TM1637/TM1637Display.c ****   // Wait for acknowledge
+  91:lib/TM1637/TM1637Display.c ****   // CLK to zero
+  92:lib/TM1637/TM1637Display.c ****   DDRB |= 1 << PB2;
+ 194               		.loc 1 92 0
+ 195 0064 BA9A      		sbi 0x17,2
+  93:lib/TM1637/TM1637Display.c ****   DDRB &= ~(1 << PB0);
+ 196               		.loc 1 93 0
+ 197 0066 B898      		cbi 0x17,0
+ 198               	.LVL12:
+ 199               	.LBB79:
+ 200               	.LBB80:
+ 201               	.LBB81:
+ 202               		.loc 2 245 0
+ 203 0068 80E1      		ldi r24,lo8(16)
+ 204 006a 8A95      		1: dec r24
+ 205 006c 01F4      		brne 1b
+ 206               	.LVL13:
+ 207 006e 00C0      		rjmp .
+ 208               	.LBE81:
+ 209               	.LBE80:
+ 210               	.LBE79:
+  94:lib/TM1637/TM1637Display.c ****   TM1637DisplayBitDelay();
+  95:lib/TM1637/TM1637Display.c ****   
+  96:lib/TM1637/TM1637Display.c ****   // CLK to high
+  97:lib/TM1637/TM1637Display.c ****   DDRB &= ~(1 << PB2);
+ 211               		.loc 1 97 0
+ 212 0070 BA98      		cbi 0x17,2
+ 213               	.LVL14:
+ 214               	.LBB82:
+ 215               	.LBB83:
+ 216               	.LBB84:
+ 217               		.loc 2 245 0
+ 218 0072 20E1      		ldi r18,lo8(16)
+ 219 0074 2A95      		1: dec r18
+ 220 0076 01F4      		brne 1b
+ 221 0078 00C0      		rjmp .
+ 222               	.LBE84:
+ 223               	.LBE83:
+ 224               	.LBE82:
+  98:lib/TM1637/TM1637Display.c ****   TM1637DisplayBitDelay();
+  99:lib/TM1637/TM1637Display.c ****   uint8_t ack = PINB & PB0;
+ 225               		.loc 1 99 0
+ 226 007a 86B3      		in r24,0x16
+ 227               	.LVL15:
+ 100:lib/TM1637/TM1637Display.c ****   if (ack == 0)
+ 101:lib/TM1637/TM1637Display.c ****   DDRB |= 1 << PB0;
+ 228               		.loc 1 101 0
+ 229 007c B89A      		sbi 0x17,0
+ 230               	.LVL16:
+ 231               	.LBB85:
+ 232               	.LBB86:
+ 233               	.LBB87:
+ 234               		.loc 2 245 0
+ 235 007e 80E1      		ldi r24,lo8(16)
+ 236 0080 8A95      		1: dec r24
+ 237 0082 01F4      		brne 1b
+ 238 0084 00C0      		rjmp .
+ 239               	.LBE87:
+ 240               	.LBE86:
+ 241               	.LBE85:
+ 102:lib/TM1637/TM1637Display.c **** 	
+ 103:lib/TM1637/TM1637Display.c **** 	
+ 104:lib/TM1637/TM1637Display.c ****   TM1637DisplayBitDelay();
+ 105:lib/TM1637/TM1637Display.c ****   DDRB |= 1 << PB2;
+ 242               		.loc 1 105 0
+ 243 0086 BA9A      		sbi 0x17,2
+ 244               	.LVL17:
+ 245               	.LBB88:
+ 246               	.LBB89:
+ 247               	.LBB90:
+ 248               		.loc 2 245 0
+ 249 0088 20E1      		ldi r18,lo8(16)
+ 250 008a 2A95      		1: dec r18
+ 251 008c 01F4      		brne 1b
+ 252 008e 00C0      		rjmp .
+ 253               	.LBE90:
+ 254               	.LBE89:
+ 255               	.LBE88:
+ 106:lib/TM1637/TM1637Display.c ****   TM1637DisplayBitDelay();
+ 107:lib/TM1637/TM1637Display.c ****   
+ 108:lib/TM1637/TM1637Display.c ****   return ack;
+ 109:lib/TM1637/TM1637Display.c **** }
+ 256               		.loc 1 109 0
+ 257 0090 80E0      		ldi r24,0
+ 258 0092 0895      		ret
+ 259               		.cfi_endproc
+ 260               	.LFE13:
+ 262               	.global	TM1637DisplayEncodeDigit
+ 264               	TM1637DisplayEncodeDigit:
+ 265               	.LFB14:
+ 110:lib/TM1637/TM1637Display.c **** 
+ 111:lib/TM1637/TM1637Display.c **** uint8_t TM1637DisplayEncodeDigit(uint8_t digit)
+ 112:lib/TM1637/TM1637Display.c **** {
+ 266               		.loc 1 112 0
+ 267               		.cfi_startproc
+ 268               	.LVL18:
+ 269               	/* prologue: function */
+ 270               	/* frame size = 0 */
+ 271               	/* stack size = 0 */
+ 272               	.L__stack_usage = 0
+ 113:lib/TM1637/TM1637Display.c **** 	return digitToSegment[digit & 0x0f];
+ 273               		.loc 1 113 0
+ 274 0094 8F70      		andi r24,lo8(15)
+ 275               	.LVL19:
+ 276 0096 E82F      		mov r30,r24
+ 277 0098 F0E0      		ldi r31,0
+ 278 009a E050      		subi r30,lo8(-(digitToSegment))
+ 279 009c F040      		sbci r31,hi8(-(digitToSegment))
+ 114:lib/TM1637/TM1637Display.c **** }
+ 280               		.loc 1 114 0
+ 281 009e 8081      		ld r24,Z
+ 282 00a0 0895      		ret
+ 283               		.cfi_endproc
+ 284               	.LFE14:
+ 286               	.global	TM1637DisplayInit
+ 288               	TM1637DisplayInit:
+ 289               	.LFB15:
+ 115:lib/TM1637/TM1637Display.c **** 
+ 116:lib/TM1637/TM1637Display.c **** void TM1637DisplayInit()
+ 117:lib/TM1637/TM1637Display.c **** {
+ 290               		.loc 1 117 0
+ 291               		.cfi_startproc
+ 292               	/* prologue: function */
+ 293               	/* frame size = 0 */
+ 294               	/* stack size = 0 */
+ 295               	.L__stack_usage = 0
+ 118:lib/TM1637/TM1637Display.c **** 
+ 119:lib/TM1637/TM1637Display.c **** 	// Set the pin direction and default value.
+ 120:lib/TM1637/TM1637Display.c **** 	// Both pins are set as inputs, allowing the pull-up resistors to pull them up
+ 121:lib/TM1637/TM1637Display.c **** 	DDRB &= ~(1 << PB0);
+ 296               		.loc 1 121 0
+ 297 00a2 B898      		cbi 0x17,0
+ 122:lib/TM1637/TM1637Display.c **** 	DDRB &= ~(1 << PB2);
+ 298               		.loc 1 122 0
+ 299 00a4 BA98      		cbi 0x17,2
+ 123:lib/TM1637/TM1637Display.c **** 
+ 124:lib/TM1637/TM1637Display.c **** 	PORTB &= ~(1 << PB0);
+ 300               		.loc 1 124 0
+ 301 00a6 C098      		cbi 0x18,0
+ 125:lib/TM1637/TM1637Display.c **** 	PORTB &= ~(1 << PB2);
+ 302               		.loc 1 125 0
+ 303 00a8 C298      		cbi 0x18,2
+ 304 00aa 0895      		ret
+ 305               		.cfi_endproc
+ 306               	.LFE15:
+ 308               	.global	TM1637DisplaySetBrightness
+ 310               	TM1637DisplaySetBrightness:
+ 311               	.LFB16:
+ 126:lib/TM1637/TM1637Display.c **** }
+ 127:lib/TM1637/TM1637Display.c **** 
+ 128:lib/TM1637/TM1637Display.c **** void TM1637DisplaySetBrightness(uint8_t brightness)
+ 129:lib/TM1637/TM1637Display.c **** {
+ 312               		.loc 1 129 0
+ 313               		.cfi_startproc
+ 314               	.LVL20:
+ 315               	/* prologue: function */
+ 316               	/* frame size = 0 */
+ 317               	/* stack size = 0 */
+ 318               	.L__stack_usage = 0
+ 130:lib/TM1637/TM1637Display.c **** 	m_brightness = brightness;
+ 319               		.loc 1 130 0
+ 320 00ac 8093 0000 		sts m_brightness,r24
+ 321 00b0 0895      		ret
+ 322               		.cfi_endproc
+ 323               	.LFE16:
+ 325               	.global	TM1637DisplaySetSegments
+ 327               	TM1637DisplaySetSegments:
+ 328               	.LFB17:
+ 131:lib/TM1637/TM1637Display.c **** }
+ 132:lib/TM1637/TM1637Display.c **** 
+ 133:lib/TM1637/TM1637Display.c **** void TM1637DisplaySetSegments(const uint8_t segments[])
+ 134:lib/TM1637/TM1637Display.c **** {
+ 329               		.loc 1 134 0
+ 330               		.cfi_startproc
+ 331               	.LVL21:
+ 332 00b2 EF92      		push r14
+ 333               	.LCFI0:
+ 334               		.cfi_def_cfa_offset 3
+ 335               		.cfi_offset 14, -2
+ 336 00b4 FF92      		push r15
+ 337               	.LCFI1:
+ 338               		.cfi_def_cfa_offset 4
+ 339               		.cfi_offset 15, -3
+ 340 00b6 0F93      		push r16
+ 341               	.LCFI2:
+ 342               		.cfi_def_cfa_offset 5
+ 343               		.cfi_offset 16, -4
+ 344 00b8 1F93      		push r17
+ 345               	.LCFI3:
+ 346               		.cfi_def_cfa_offset 6
+ 347               		.cfi_offset 17, -5
+ 348 00ba CF93      		push r28
+ 349               	.LCFI4:
+ 350               		.cfi_def_cfa_offset 7
+ 351               		.cfi_offset 28, -6
+ 352 00bc DF93      		push r29
+ 353               	.LCFI5:
+ 354               		.cfi_def_cfa_offset 8
+ 355               		.cfi_offset 29, -7
+ 356 00be 1F92      		push __zero_reg__
+ 357               	.LCFI6:
+ 358               		.cfi_def_cfa_offset 9
+ 359 00c0 CDB7      		in r28,__SP_L__
+ 360 00c2 DEB7      		in r29,__SP_H__
+ 361               	.LCFI7:
+ 362               		.cfi_def_cfa_register 28
+ 363               	/* prologue: function */
+ 364               	/* frame size = 1 */
+ 365               	/* stack size = 7 */
+ 366               	.L__stack_usage = 7
+ 367 00c4 182F      		mov r17,r24
+ 135:lib/TM1637/TM1637Display.c ****     // Write COMM1
+ 136:lib/TM1637/TM1637Display.c **** 	TM1637DisplayStart();
+ 368               		.loc 1 136 0
+ 369 00c6 9983      		std Y+1,r25
+ 370 00c8 00D0      		rcall TM1637DisplayStart
+ 371               	.LVL22:
+ 137:lib/TM1637/TM1637Display.c **** 	TM1637DisplayWriteByte(TM1637_I2C_COMM1);
+ 372               		.loc 1 137 0
+ 373 00ca 80E4      		ldi r24,lo8(64)
+ 374 00cc 00D0      		rcall TM1637DisplayWriteByte
+ 375               	.LVL23:
+ 138:lib/TM1637/TM1637Display.c **** 	TM1637DisplayStop();
+ 376               		.loc 1 138 0
+ 377 00ce 00D0      		rcall TM1637DisplayStop
+ 378               	.LVL24:
+ 139:lib/TM1637/TM1637Display.c **** 	
+ 140:lib/TM1637/TM1637Display.c **** 	// Write COMM2 + first digit address
+ 141:lib/TM1637/TM1637Display.c **** 	TM1637DisplayStart();
+ 379               		.loc 1 141 0
+ 380 00d0 00D0      		rcall TM1637DisplayStart
+ 381               	.LVL25:
+ 142:lib/TM1637/TM1637Display.c **** 	TM1637DisplayWriteByte(TM1637_I2C_COMM2 + (0 & 0x03));
+ 382               		.loc 1 142 0
+ 383 00d2 80EC      		ldi r24,lo8(-64)
+ 384 00d4 00D0      		rcall TM1637DisplayWriteByte
+ 385               	.LVL26:
+ 386 00d6 E12E      		mov r14,r17
+ 387 00d8 9981      		ldd r25,Y+1
+ 388 00da F92E      		mov r15,r25
+ 389 00dc 8701      		movw r16,r14
+ 390 00de 0C5F      		subi r16,-4
+ 391 00e0 1F4F      		sbci r17,-1
+ 392               	.LVL27:
+ 393               	.L14:
+ 394               	.LBB91:
+ 143:lib/TM1637/TM1637Display.c **** 	
+ 144:lib/TM1637/TM1637Display.c **** 	// Write the data bytes
+ 145:lib/TM1637/TM1637Display.c **** 	for (uint8_t k=0; k < 4; k++) 
+ 146:lib/TM1637/TM1637Display.c **** 	  TM1637DisplayWriteByte(segments[k]);
+ 395               		.loc 1 146 0 discriminator 3
+ 396 00e2 F701      		movw r30,r14
+ 397 00e4 8191      		ld r24,Z+
+ 398 00e6 7F01      		movw r14,r30
+ 399               	.LVL28:
+ 400 00e8 00D0      		rcall TM1637DisplayWriteByte
+ 401               	.LVL29:
+ 145:lib/TM1637/TM1637Display.c **** 	  TM1637DisplayWriteByte(segments[k]);
+ 402               		.loc 1 145 0 discriminator 3
+ 403 00ea E016      		cp r14,r16
+ 404 00ec F106      		cpc r15,r17
+ 405 00ee 01F4      		brne .L14
+ 406               	.LBE91:
+ 147:lib/TM1637/TM1637Display.c **** 	  
+ 148:lib/TM1637/TM1637Display.c **** 	TM1637DisplayStop();
+ 407               		.loc 1 148 0
+ 408 00f0 00D0      		rcall TM1637DisplayStop
+ 409               	.LVL30:
+ 149:lib/TM1637/TM1637Display.c **** 
+ 150:lib/TM1637/TM1637Display.c **** 	// Write COMM3 + brightness
+ 151:lib/TM1637/TM1637Display.c **** 	TM1637DisplayStart();
+ 410               		.loc 1 151 0
+ 411 00f2 00D0      		rcall TM1637DisplayStart
+ 412               	.LVL31:
+ 152:lib/TM1637/TM1637Display.c **** 	TM1637DisplayWriteByte(TM1637_I2C_COMM3 + (m_brightness & 0x0f));
+ 413               		.loc 1 152 0
+ 414 00f4 8091 0000 		lds r24,m_brightness
+ 415 00f8 8F70      		andi r24,lo8(15)
+ 416 00fa 8058      		subi r24,lo8(-(-128))
+ 417 00fc 00D0      		rcall TM1637DisplayWriteByte
+ 418               	.LVL32:
+ 419               	/* epilogue start */
+ 153:lib/TM1637/TM1637Display.c **** 	TM1637DisplayStop();
+ 154:lib/TM1637/TM1637Display.c **** }
+ 420               		.loc 1 154 0
+ 421 00fe 0F90      		pop __tmp_reg__
+ 422 0100 DF91      		pop r29
+ 423 0102 CF91      		pop r28
+ 424 0104 1F91      		pop r17
+ 425 0106 0F91      		pop r16
+ 426 0108 FF90      		pop r15
+ 427 010a EF90      		pop r14
+ 428               	.LVL33:
+ 153:lib/TM1637/TM1637Display.c **** 	TM1637DisplayStop();
+ 429               		.loc 1 153 0
+ 430 010c 00C0      		rjmp TM1637DisplayStop
+ 431               	.LVL34:
+ 432               		.cfi_endproc
+ 433               	.LFE17:
+ 435               	.global	TM1637DisplayShowNumberDec
+ 437               	TM1637DisplayShowNumberDec:
+ 438               	.LFB18:
+ 155:lib/TM1637/TM1637Display.c ****  
+ 156:lib/TM1637/TM1637Display.c **** void TM1637DisplayShowNumberDec(int num, bool leading_zero)
+ 157:lib/TM1637/TM1637Display.c **** {
+ 439               		.loc 1 157 0
+ 440               		.cfi_startproc
+ 441               	.LVL35:
+ 442 010e 9F92      		push r9
+ 443               	.LCFI8:
+ 444               		.cfi_def_cfa_offset 3
+ 445               		.cfi_offset 9, -2
+ 446 0110 AF92      		push r10
+ 447               	.LCFI9:
+ 448               		.cfi_def_cfa_offset 4
+ 449               		.cfi_offset 10, -3
+ 450 0112 BF92      		push r11
+ 451               	.LCFI10:
+ 452               		.cfi_def_cfa_offset 5
+ 453               		.cfi_offset 11, -4
+ 454 0114 CF92      		push r12
+ 455               	.LCFI11:
+ 456               		.cfi_def_cfa_offset 6
+ 457               		.cfi_offset 12, -5
+ 458 0116 DF92      		push r13
+ 459               	.LCFI12:
+ 460               		.cfi_def_cfa_offset 7
+ 461               		.cfi_offset 13, -6
+ 462 0118 EF92      		push r14
+ 463               	.LCFI13:
+ 464               		.cfi_def_cfa_offset 8
+ 465               		.cfi_offset 14, -7
+ 466 011a FF92      		push r15
+ 467               	.LCFI14:
+ 468               		.cfi_def_cfa_offset 9
+ 469               		.cfi_offset 15, -8
+ 470 011c 0F93      		push r16
+ 471               	.LCFI15:
+ 472               		.cfi_def_cfa_offset 10
+ 473               		.cfi_offset 16, -9
+ 474 011e 1F93      		push r17
+ 475               	.LCFI16:
+ 476               		.cfi_def_cfa_offset 11
+ 477               		.cfi_offset 17, -10
+ 478 0120 CF93      		push r28
+ 479               	.LCFI17:
+ 480               		.cfi_def_cfa_offset 12
+ 481               		.cfi_offset 28, -11
+ 482 0122 DF93      		push r29
+ 483               	.LCFI18:
+ 484               		.cfi_def_cfa_offset 13
+ 485               		.cfi_offset 29, -12
+ 486 0124 00D0      		rcall .
+ 487 0126 00D0      		rcall .
+ 488               	.LCFI19:
+ 489               		.cfi_def_cfa_offset 17
+ 490 0128 CDB7      		in r28,__SP_L__
+ 491 012a DEB7      		in r29,__SP_H__
+ 492               	.LCFI20:
+ 493               		.cfi_def_cfa_register 28
+ 494               	/* prologue: function */
+ 495               	/* frame size = 4 */
+ 496               	/* stack size = 15 */
+ 497               	.L__stack_usage = 15
+ 498 012c 8C01      		movw r16,r24
+ 499 012e A62E      		mov r10,r22
+ 500               	.LVL36:
+ 501 0130 80E0      		ldi r24,lo8(divisors.1976+8)
+ 502 0132 E82E      		mov r14,r24
+ 503 0134 80E0      		ldi r24,hi8(divisors.1976+8)
+ 504 0136 F82E      		mov r15,r24
+ 505               	.LVL37:
+ 506 0138 FE01      		movw r30,r28
+ 507 013a 3196      		adiw r30,1
+ 508               	.LBB92:
+ 158:lib/TM1637/TM1637Display.c **** 	uint8_t digits[4];
+ 159:lib/TM1637/TM1637Display.c **** 	const static int divisors[] = { 1, 10, 100, 1000 };
+ 160:lib/TM1637/TM1637Display.c **** 	bool leading = true;
+ 161:lib/TM1637/TM1637Display.c **** 	
+ 162:lib/TM1637/TM1637Display.c **** 	for(int8_t k = 0; k < 4; k++) {
+ 509               		.loc 1 162 0
+ 510 013c 20E0      		ldi r18,0
+ 511               	.LBE92:
+ 160:lib/TM1637/TM1637Display.c **** 	
+ 512               		.loc 1 160 0
+ 513 013e 31E0      		ldi r19,lo8(1)
+ 514 0140 BE2E      		mov r11,r30
+ 515 0142 4F2F      		mov r20,r31
+ 516               	.LBB96:
+ 517               	.LBB93:
+ 163:lib/TM1637/TM1637Display.c **** 	    int divisor = divisors[4 - 1 - k];
+ 164:lib/TM1637/TM1637Display.c **** 		int d = num / divisor;
+ 165:lib/TM1637/TM1637Display.c **** 		
+ 166:lib/TM1637/TM1637Display.c **** 		if (d == 0) {
+ 167:lib/TM1637/TM1637Display.c **** 		  if (leading_zero || !leading || (k == 3))
+ 168:lib/TM1637/TM1637Display.c **** 		    digits[k] = TM1637DisplayEncodeDigit(d);
+ 518               		.loc 1 168 0
+ 519 0144 9FE3      		ldi r25,lo8(63)
+ 520 0146 992E      		mov r9,r25
+ 521               	.LVL38:
+ 522               	.L21:
+ 163:lib/TM1637/TM1637Display.c **** 	    int divisor = divisors[4 - 1 - k];
+ 523               		.loc 1 163 0
+ 524 0148 D701      		movw r26,r14
+ 525 014a DE90      		ld r13,-X
+ 526 014c CE90      		ld r12,-X
+ 527 014e 7D01      		movw r14,r26
+ 528               	.LVL39:
+ 164:lib/TM1637/TM1637Display.c **** 		
+ 529               		.loc 1 164 0
+ 530 0150 C801      		movw r24,r16
+ 531 0152 B601      		movw r22,r12
+ 532 0154 00D0      		rcall __divmodhi4
+ 533 0156 CB01      		movw r24,r22
+ 534               	.LVL40:
+ 166:lib/TM1637/TM1637Display.c **** 		  if (leading_zero || !leading || (k == 3))
+ 535               		.loc 1 166 0
+ 536 0158 0097      		sbiw r24,0
+ 537 015a 01F4      		brne .L17
+ 167:lib/TM1637/TM1637Display.c **** 		    digits[k] = TM1637DisplayEncodeDigit(d);
+ 538               		.loc 1 167 0
+ 539 015c A110      		cpse r10,__zero_reg__
+ 540 015e 00C0      		rjmp .L18
+ 167:lib/TM1637/TM1637Display.c **** 		    digits[k] = TM1637DisplayEncodeDigit(d);
+ 541               		.loc 1 167 0 is_stmt 0 discriminator 1
+ 542 0160 3323      		tst r19
+ 543 0162 01F0      		breq .L18
+ 167:lib/TM1637/TM1637Display.c **** 		    digits[k] = TM1637DisplayEncodeDigit(d);
+ 544               		.loc 1 167 0 discriminator 2
+ 545 0164 2330      		cpi r18,lo8(3)
+ 546 0166 01F4      		brne .L19
+ 547               	.L18:
+ 548               	.LVL41:
+ 549               		.loc 1 168 0 is_stmt 1
+ 550 0168 9082      		st Z,r9
+ 551 016a 00C0      		rjmp .L20
+ 552               	.LVL42:
+ 553               	.L19:
+ 169:lib/TM1637/TM1637Display.c **** 	      else
+ 170:lib/TM1637/TM1637Display.c **** 		    digits[k] = 0;
+ 554               		.loc 1 170 0
+ 555 016c 1082      		st Z,__zero_reg__
+ 556 016e 00C0      		rjmp .L20
+ 557               	.L17:
+ 558               	.LVL43:
+ 559               	.LBB94:
+ 560               	.LBB95:
+ 113:lib/TM1637/TM1637Display.c **** }
+ 561               		.loc 1 113 0
+ 562 0170 A62F      		mov r26,r22
+ 563 0172 AF70      		andi r26,lo8(15)
+ 564 0174 B0E0      		ldi r27,0
+ 565 0176 A050      		subi r26,lo8(-(digitToSegment))
+ 566 0178 B040      		sbci r27,hi8(-(digitToSegment))
+ 567               	.LBE95:
+ 568               	.LBE94:
+ 171:lib/TM1637/TM1637Display.c **** 		}
+ 172:lib/TM1637/TM1637Display.c **** 		else {
+ 173:lib/TM1637/TM1637Display.c **** 			digits[k] = TM1637DisplayEncodeDigit(d);
+ 569               		.loc 1 173 0
+ 570 017a 3C91      		ld r19,X
+ 571               	.LVL44:
+ 572 017c 3083      		st Z,r19
+ 174:lib/TM1637/TM1637Display.c **** 			num -= d * divisor;
+ 573               		.loc 1 174 0
+ 574 017e B601      		movw r22,r12
+ 575               	.LVL45:
+ 576 0180 00D0      		rcall __mulhi3
+ 577               	.LVL46:
+ 578 0182 081B      		sub r16,r24
+ 579 0184 190B      		sbc r17,r25
+ 580               	.LVL47:
+ 175:lib/TM1637/TM1637Display.c **** 			leading = false;
+ 581               		.loc 1 175 0
+ 582 0186 30E0      		ldi r19,0
+ 583               	.LVL48:
+ 584               	.L20:
+ 585 0188 2F5F      		subi r18,lo8(-(1))
+ 586               	.LVL49:
+ 587 018a 3196      		adiw r30,1
+ 588               	.LBE93:
+ 162:lib/TM1637/TM1637Display.c **** 	    int divisor = divisors[4 - 1 - k];
+ 589               		.loc 1 162 0 discriminator 2
+ 590 018c 2430      		cpi r18,lo8(4)
+ 591 018e 01F4      		brne .L21
+ 592               	.LBE96:
+ 176:lib/TM1637/TM1637Display.c **** 		}
+ 177:lib/TM1637/TM1637Display.c **** 	}
+ 178:lib/TM1637/TM1637Display.c **** 	
+ 179:lib/TM1637/TM1637Display.c **** 	TM1637DisplaySetSegments(digits);
+ 593               		.loc 1 179 0
+ 594 0190 8B2D      		mov r24,r11
+ 595 0192 942F      		mov r25,r20
+ 596 0194 00D0      		rcall TM1637DisplaySetSegments
+ 597               	.LVL50:
+ 598               	/* epilogue start */
+ 180:lib/TM1637/TM1637Display.c **** }
+ 599               		.loc 1 180 0
+ 600 0196 0F90      		pop __tmp_reg__
+ 601 0198 0F90      		pop __tmp_reg__
+ 602 019a 0F90      		pop __tmp_reg__
+ 603 019c 0F90      		pop __tmp_reg__
+ 604 019e DF91      		pop r29
+ 605 01a0 CF91      		pop r28
+ 606 01a2 1F91      		pop r17
+ 607 01a4 0F91      		pop r16
+ 608               	.LVL51:
+ 609 01a6 FF90      		pop r15
+ 610 01a8 EF90      		pop r14
+ 611 01aa DF90      		pop r13
+ 612 01ac CF90      		pop r12
+ 613               	.LVL52:
+ 614 01ae BF90      		pop r11
+ 615 01b0 AF90      		pop r10
+ 616               	.LVL53:
+ 617 01b2 9F90      		pop r9
+ 618 01b4 0895      		ret
+ 619               		.cfi_endproc
+ 620               	.LFE18:
+ 622               		.section	.rodata
+ 625               	divisors.1976:
+ 626 0000 0100      		.word	1
+ 627 0002 0A00      		.word	10
+ 628 0004 6400      		.word	100
+ 629 0006 E803      		.word	1000
+ 630               	.global	digitToSegment
+ 633               	digitToSegment:
+ 634 0008 3F        		.byte	63
+ 635 0009 06        		.byte	6
+ 636 000a 5B        		.byte	91
+ 637 000b 4F        		.byte	79
+ 638 000c 66        		.byte	102
+ 639 000d 6D        		.byte	109
+ 640 000e 7D        		.byte	125
+ 641 000f 07        		.byte	7
+ 642 0010 7F        		.byte	127
+ 643 0011 6F        		.byte	111
+ 644 0012 77        		.byte	119
+ 645 0013 7C        		.byte	124
+ 646 0014 39        		.byte	57
+ 647 0015 5E        		.byte	94
+ 648 0016 79        		.byte	121
+ 649 0017 71        		.byte	113
+ 650               		.comm	m_brightness,1,1
+ 651               		.text
+ 652               	.Letext0:
+ 653               		.file 3 "/usr/local/Cellar/avr-gcc/4.9.2/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 TM1637Display.c
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:5      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:6      *ABS*:0000000000000001 __zero_reg__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:12     .text:0000000000000000 TM1637DisplayBitDelay
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:38     .text:000000000000000a TM1637DisplayStart
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:66     .text:0000000000000016 TM1637DisplayStop
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:122    .text:0000000000000036 TM1637DisplayWriteByte
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:264    .text:0000000000000094 TM1637DisplayEncodeDigit
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:633    .rodata:0000000000000008 digitToSegment
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:288    .text:00000000000000a2 TM1637DisplayInit
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:310    .text:00000000000000ac TM1637DisplaySetBrightness
+                            *COM*:0000000000000001 m_brightness
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:327    .text:00000000000000b2 TM1637DisplaySetSegments
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:437    .text:000000000000010e TM1637DisplayShowNumberDec
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//cccNWmL7.s:625    .rodata:0000000000000000 divisors.1976
+
+UNDEFINED SYMBOLS
+__divmodhi4
+__mulhi3
+__do_copy_data
+__do_clear_bss

@@ -1,0 +1,372 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"do",
+				"documentHeight"
+			],
+			[
+				"doc",
+				"documentWidth"
+			],
+			[
+				"mar",
+				"margin"
+			],
+			[
+				"text",
+				"text-decoration"
+			],
+			[
+				"bor",
+				"border"
+			],
+			[
+				"inl",
+				"inline-block"
+			],
+			[
+				"fon",
+				"font-size"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"wi",
+				"width"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 167.0,
+		"last_filter": "mark",
+		"selected_items":
+		[
+			[
+				"mark",
+				"Set Syntax: Markdown"
+			],
+			[
+				"form",
+				"Format: Javascript"
+			],
+			[
+				"css",
+				"Format CSS: Compact"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"forma",
+				"Format: Javascript"
+			],
+			[
+				"c++",
+				"Set Syntax: C++"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+	],
+	"file_history":
+	[
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-02-28-project-ambrosia.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_includes/head.html",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/public/css/style.css",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2015-12-11-rottweil-skyline.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_layouts/project.html",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/public/scripts/scripts.js",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_config.yml",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_layouts/default.html",
+		"/Users/daniel/Downloads/wireshark-2.0.0/configure.ac",
+		"/Users/daniel/Downloads/wireshark-2.0.0/configure",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/projects.html",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2015-12-15-light-clock.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-04-23-alarm-clock.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2015-04-23-ceiling-lamp.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2014-07-11-networksecurity-introduction.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2014-06-29-wall-light.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2014-04-12-weather-display.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-12-24-lightprime.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-07-29-waking-wind-receiver.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-07-14-wall-clock.md",
+		"/Applications/Copper.app/Contents/Resources/Theme.json",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/project-ambrosia.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/waking-wind-receiver.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/wall-light.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/wall-clock.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/impress.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/networksecurity-introduction.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/ceiling-lamp.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/public/css/github-markdown.css",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/alarm-clock.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/weather-display.md",
+		"/Users/daniel/Downloads/lego2.svg",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/about.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_layouts/post.html",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_includes/sidebar.html",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_posts/2013-12-31-whats-jekyllcopy2.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-12-31-whats-jekyllcopy4.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-12-31-whats-jekyllcopy5.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-12-31-whats-jekyllcopy6.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-12-31-whats-jekyllcopy7.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/projects/2013-12-31-whats-jekyll copy 6.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/projects/2013-12-31-whats-jekyll copy 5.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/projects/2013-12-31-whats-jekyll copy 4.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/projects/2013-12-31-whats-jekyll copy 7.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_projects/2013-12-31-whats-jekyll copy 4.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/index.html",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_posts/2013-12-31-whats-jekyll copy 3.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_posts/2013-12-31-whats-jekyll copy 2.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/.jekyll-metadata",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_posts/2014-01-01-example-content copy 2.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_posts/2013-12-31-whats-jekyll.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_posts/2013-12-31-whats-jekyll copy.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_layouts/page.html",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/blog.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_posts/2014-01-02-introducing-lanyon.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/_posts/2014-01-01-example-content.md",
+		"/Users/daniel/Documents/USB Power Meter/Firmware/7 Segment/main.c",
+		"/Users/daniel/Documents/USB Power Meter/Firmware/7 Segment/lib/TM1637/TM1637Display.h",
+		"/Users/daniel/Documents/USB Power Meter/Firmware/7 Segment/Makefile",
+		"/Users/daniel/Documents/USB Power Meter/Firmware/7 Segment/lib/TM1637/TM1637Display.c",
+		"/Users/daniel/Documents/USB Power Meter/Firmware/7 Segment/lib/ADC/adc.h",
+		"/Users/daniel/Documents/USB Power Meter/Firmware/7 Segment/lib/ADC/adc.c",
+		"/Applications/Arduino.app/Contents/Java/libraries/TM1637/TM1637Display.cpp",
+		"/Users/daniel/Desktop/dropster/client/app/main/main.html",
+		"/Users/daniel/Desktop/nupo-artworks-template/style/style.css",
+		"/Users/daniel/Desktop/nupo-artworks-template/scripts.js",
+		"/Users/daniel/Desktop/nupo-artworks-template/index.html",
+		"/Users/daniel/Desktop/nupo-artworks-template/style/github-markdown.css",
+		"/Users/daniel/Desktop/nupo-artworks-template/style.css",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/404.html",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/atom.xml",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/LICENSE.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/README.md",
+		"/Users/daniel/Dropbox/Privat/nupoArtworks/nupo-artworks/_config.yml",
+		"/Users/daniel/Desktop/dropster/server/api/user/user.model.js",
+		"/Users/daniel/Desktop/dropster/server/api/user/user.controller.js",
+		"/Users/daniel/Desktop/dropster/server/api/user/index.js",
+		"/Users/daniel/Desktop/dropster/server/api/thing/thing.socket.js",
+		"/Users/daniel/Desktop/dropster/client/index.html",
+		"/Applications/Spotify.app/Contents/Resources/Apps/radio.spa",
+		"/Users/daniel/Desktop/dropster/client/components/navbar/navbar.html",
+		"/Users/daniel/Desktop/dropster/server/views/404.html",
+		"/Users/daniel/Desktop/dropster/client/app/account/login/login.html",
+		"/Users/daniel/Desktop/dropster/README.md",
+		"/Users/daniel/Dropbox/Studium/Master/Semester 2/Webapplication Architecture/dropster/playground/style.css",
+		"/Users/daniel/Dropbox/Studium/Master/Semester 2/Webapplication Architecture/dropster/playground/index.html",
+		"/Users/daniel/Dropbox/Studium/Master/Semester 2/Webapplication Architecture/dropster/playground/script.js",
+		"/Users/daniel/Downloads/WG GIGATRONIK-Newsletter 012015  GT Armory Welcome Information.htm",
+		"/Users/daniel/Dropbox/Studium/Master/Semester 2/Webapplication Architecture/dropster/Gruntfile.js",
+		"/Users/daniel/Downloads/Sundial_Digital_13oct2015.scad",
+		"/Users/daniel/Downloads/digitalocean.pub",
+		"/Users/daniel/Desktop/OwnStuff.lbr",
+		"/Applications/Arduino.app/Contents/Java/libraries/DS1307/DS1307.cpp",
+		"/Applications/Arduino.app/Contents/Java/libraries/Adafruit_DotStar/examples/strandtest/strandtest.ino",
+		"/Users/daniel/Documents/eagle/Clock/place diodes a102.js",
+		"/Users/daniel/Documents/eagle/Clock/place diodes.js",
+		"/Volumes/OSX HD 1/adobe/Adobe After Effects CC 2015 v13.5/pwis_mojado",
+		"/Volumes/OSX HD 1/adobe/Adobe Photoshop CC 2015.0.0 20150529.r.88 MacOSX/Crack-OSX/disable_activation_osx",
+		"/Users/daniel/Dropbox/Studium/Master/Semester 2/Ultra Largescale Systems/ToDo",
+		"/Users/daniel/Desktop/Hi EEVBlog Community,"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"-*/node_modules/*, -*/bower_components/*",
+			"-*/node_modules/*",
+			"/Users/daniel/Desktop/dropster"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"	",
+			"\n	",
+			"	",
+			"'",
+			"	",
+			"**",
+			"media",
+			"img",
+			"jpg",
+			"content",
+			"border-bottom",
+			"curso",
+			"encode",
+			"writeByte",
+			".header",
+			"#layout",
+			"layout",
+			"main",
+			"background-co",
+			"active",
+			"#menu",
+			"layout",
+			"h2",
+			"url",
+			"relative_",
+			"seed",
+			"clean",
+			"clean:dist",
+			"clean",
+			"node-inspe",
+			"mongo",
+			"inspec",
+			"ampm",
+			"OUTER_RADIUS",
+			"SCALE_FACTOR",
+			"LEDMAPPING",
+			","
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "OLED.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/Dropbox/Privat/nupoArtworks/nupo-artworks.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 230.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

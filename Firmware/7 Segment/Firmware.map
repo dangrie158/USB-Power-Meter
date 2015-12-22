@@ -1,0 +1,797 @@
+Archive member included to satisfy reference by file (symbol)
+
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o)
+                              main.o (__divsf3)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o) (__divsf3x)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o)
+                              main.o (__fixsfsi)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o) (__fixunssfsi)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(floatsisf.o)
+                              main.o (__floatunsisf)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_inf.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o) (__fp_inf)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_nan.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o) (__fp_nan)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscA.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o) (__fp_pscA)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscB.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o) (__fp_pscB)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_round.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o) (__fp_round)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_split3.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o) (__fp_split3)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_zero.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o) (__fp_zero)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o)
+                              main.o (__mulsf3)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o) (__mulsf3x)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+                              lib/TM1637/TM1637Display.o (__mulhi3)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+                              lib/TM1637/TM1637Display.o (__divmodhi4)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+                              lib/ADC/ADC.o (__udivmodsi4)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o (exit)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+                              lib/TM1637/TM1637Display.o (__do_copy_data)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+                              main.o (__do_clear_bss)
+/usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o) (__udivmodhi4)
+
+Allocating common symbols
+Common symbol       size              file
+
+m_brightness        0x1               lib/TM1637/TM1637Display.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x0000000000000000 0x0000000000002000 xr
+data             0x0000000000800060 0x000000000000ffa0 rw !x
+eeprom           0x0000000000810000 0x0000000000010000 rw !x
+fuse             0x0000000000820000 0x0000000000000400 rw !x
+lock             0x0000000000830000 0x0000000000000400 rw !x
+signature        0x0000000000840000 0x0000000000000400 rw !x
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+LOAD main.o
+LOAD lib/TM1637/TM1637Display.o
+LOAD lib/ADC/ADC.o
+LOAD /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a
+START GROUP
+LOAD /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a
+LOAD /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a
+LOAD /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libc.a
+END GROUP
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x0000000000000000      0x728
+ *(.vectors)
+ .vectors       0x0000000000000000       0x1e /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+                0x0000000000000000                __vectors
+                0x0000000000000000                __vector_default
+ *(.vectors)
+ *(.progmem.gcc*)
+                0x000000000000001e                . = ALIGN (0x2)
+                0x000000000000001e                __trampolines_start = .
+ *(.trampolines)
+ .trampolines   0x000000000000001e        0x0 linker stubs
+ *(.trampolines*)
+                0x000000000000001e                __trampolines_end = .
+ *(.progmem*)
+                0x000000000000001e                . = ALIGN (0x2)
+ *(.jumptables)
+ *(.jumptables*)
+ *(.lowtext)
+ *(.lowtext*)
+                0x000000000000001e                __ctors_start = .
+ *(.ctors)
+                0x000000000000001e                __ctors_end = .
+                0x000000000000001e                __dtors_start = .
+ *(.dtors)
+                0x000000000000001e                __dtors_end = .
+ SORT(*)(.ctors)
+ SORT(*)(.dtors)
+ *(.init0)
+ .init0         0x000000000000001e        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+                0x000000000000001e                __init
+ *(.init0)
+ *(.init1)
+ *(.init1)
+ *(.init2)
+ .init2         0x000000000000001e        0xc /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+ *(.init2)
+ *(.init3)
+ *(.init3)
+ *(.init4)
+ .init4         0x000000000000002a       0x16 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+                0x000000000000002a                __do_copy_data
+ .init4         0x0000000000000040       0x10 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+                0x0000000000000040                __do_clear_bss
+ *(.init4)
+ *(.init5)
+ *(.init5)
+ *(.init6)
+ *(.init6)
+ *(.init7)
+ *(.init7)
+ *(.init8)
+ *(.init8)
+ *(.init9)
+ .init9         0x0000000000000050        0x4 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+ *(.init9)
+ *(.text)
+ .text          0x0000000000000054        0x2 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+                0x0000000000000054                __vector_10
+                0x0000000000000054                __vector_12
+                0x0000000000000054                __bad_interrupt
+                0x0000000000000054                __vector_6
+                0x0000000000000054                __vector_3
+                0x0000000000000054                __vector_11
+                0x0000000000000054                __vector_13
+                0x0000000000000054                __vector_7
+                0x0000000000000054                __vector_5
+                0x0000000000000054                __vector_4
+                0x0000000000000054                __vector_9
+                0x0000000000000054                __vector_2
+                0x0000000000000054                __vector_8
+                0x0000000000000054                __vector_14
+                0x0000000000000054                __vector_1
+ .text          0x0000000000000056        0x0 main.o
+ .text          0x0000000000000056      0x1b6 lib/TM1637/TM1637Display.o
+                0x0000000000000056                TM1637DisplayBitDelay
+                0x0000000000000060                TM1637DisplayStart
+                0x000000000000006c                TM1637DisplayStop
+                0x000000000000008c                TM1637DisplayWriteByte
+                0x00000000000000ea                TM1637DisplayEncodeDigit
+                0x00000000000000f8                TM1637DisplayInit
+                0x0000000000000102                TM1637DisplaySetBrightness
+                0x0000000000000108                TM1637DisplaySetSegments
+                0x0000000000000164                TM1637DisplayShowNumberDec
+ .text          0x000000000000020c       0x84 lib/ADC/ADC.o
+                0x000000000000020c                AdcSetDifferentialInputMode
+                0x0000000000000220                AdcSetSingleEndedMode
+                0x000000000000022c                AdcGetSample
+                0x0000000000000238                AdcInit
+                0x000000000000024a                AdcGetMultiSample
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(floatsisf.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_inf.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_nan.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscA.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscB.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_round.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_split3.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_zero.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .text          0x0000000000000290        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+                0x0000000000000290                . = ALIGN (0x2)
+ *(.text.*)
+ .text.startup  0x0000000000000290       0xbc main.o
+                0x0000000000000290                main
+ .text.avr-libc.fplib
+                0x000000000000034c        0x4 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o)
+                0x000000000000034c                __divsf3
+ .text.avr-libc.fplib
+                0x0000000000000350       0xcc /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+                0x0000000000000366                __divsf3x
+                0x000000000000036a                __divsf3_pse
+ .text.avr-libc.fplib
+                0x000000000000041c        0xa /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o)
+                0x000000000000041c                __fixsfsi
+ .text.avr-libc.fplib
+                0x0000000000000426       0x58 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o)
+                0x0000000000000426                __fixunssfsi
+ .text.avr-libc.fplib
+                0x000000000000047e       0x7a /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(floatsisf.o)
+                0x000000000000047e                __floatunsisf
+                0x0000000000000482                __floatsisf
+ .text.avr-libc.fplib
+                0x00000000000004f8        0xc /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_inf.o)
+                0x00000000000004f8                __fp_inf
+ .text.avr-libc.fplib
+                0x0000000000000504        0x6 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_nan.o)
+                0x0000000000000504                __fp_nan
+ .text.avr-libc.fplib
+                0x000000000000050a        0xe /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscA.o)
+                0x000000000000050a                __fp_pscA
+ .text.avr-libc.fplib
+                0x0000000000000518        0xe /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscB.o)
+                0x0000000000000518                __fp_pscB
+ .text.avr-libc.fplib
+                0x0000000000000526       0x22 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_round.o)
+                0x0000000000000526                __fp_round
+ .text.avr-libc.fplib
+                0x0000000000000548       0x44 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_split3.o)
+                0x0000000000000548                __fp_split3
+                0x0000000000000558                __fp_splitA
+ .text.avr-libc.fplib
+                0x000000000000058c        0xe /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_zero.o)
+                0x000000000000058c                __fp_zero
+                0x000000000000058e                __fp_szero
+ .text.avr-libc.fplib
+                0x000000000000059a        0x4 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o)
+                0x000000000000059a                __mulsf3
+ .text.avr-libc.fplib
+                0x000000000000059e       0xd2 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                0x00000000000005b0                __mulsf3x
+                0x00000000000005b4                __mulsf3_pse
+ .text.libgcc.mul
+                0x0000000000000670       0x22 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+                0x0000000000000670                __mulhi3
+ .text.libgcc.div
+                0x0000000000000692        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .text.libgcc   0x0000000000000692        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .text.libgcc.prologue
+                0x0000000000000692        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .text.libgcc.builtins
+                0x0000000000000692        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .text.libgcc.fmul
+                0x0000000000000692        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .text.libgcc.fixed
+                0x0000000000000692        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .text.libgcc.mul
+                0x0000000000000692        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .text.libgcc.div
+                0x0000000000000692       0x26 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+                0x0000000000000692                __divmodhi4
+                0x0000000000000692                _div
+ .text.libgcc   0x00000000000006b8        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .text.libgcc.prologue
+                0x00000000000006b8        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .text.libgcc.builtins
+                0x00000000000006b8        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .text.libgcc.fmul
+                0x00000000000006b8        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .text.libgcc.fixed
+                0x00000000000006b8        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .text.libgcc.mul
+                0x00000000000006b8        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .text.libgcc.div
+                0x00000000000006b8       0x44 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+                0x00000000000006b8                __udivmodsi4
+ .text.libgcc   0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .text.libgcc.prologue
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .text.libgcc.builtins
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .text.libgcc.fmul
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .text.libgcc.fixed
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .text.libgcc.mul
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .text.libgcc.div
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .text.libgcc   0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .text.libgcc.prologue
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .text.libgcc.builtins
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .text.libgcc.fmul
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .text.libgcc.fixed
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .text.libgcc.mul
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .text.libgcc.div
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .text.libgcc   0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .text.libgcc.prologue
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .text.libgcc.builtins
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .text.libgcc.fmul
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .text.libgcc.fixed
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .text.libgcc.mul
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .text.libgcc.div
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .text.libgcc   0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .text.libgcc.prologue
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .text.libgcc.builtins
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .text.libgcc.fmul
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .text.libgcc.fixed
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .text.libgcc.mul
+                0x00000000000006fc        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.div
+                0x00000000000006fc       0x28 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+                0x00000000000006fc                __udivmodhi4
+ .text.libgcc   0x0000000000000724        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.prologue
+                0x0000000000000724        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.builtins
+                0x0000000000000724        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.fmul
+                0x0000000000000724        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+ .text.libgcc.fixed
+                0x0000000000000724        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+                0x0000000000000724                . = ALIGN (0x2)
+ *(.fini9)
+ .fini9         0x0000000000000724        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+                0x0000000000000724                exit
+                0x0000000000000724                _exit
+ *(.fini9)
+ *(.fini8)
+ *(.fini8)
+ *(.fini7)
+ *(.fini7)
+ *(.fini6)
+ *(.fini6)
+ *(.fini5)
+ *(.fini5)
+ *(.fini4)
+ *(.fini4)
+ *(.fini3)
+ *(.fini3)
+ *(.fini2)
+ *(.fini2)
+ *(.fini1)
+ *(.fini1)
+ *(.fini0)
+ .fini0         0x0000000000000724        0x4 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ *(.fini0)
+                0x0000000000000728                _etext = .
+
+.data           0x0000000000800060       0x18 load address 0x0000000000000728
+                0x0000000000800060                PROVIDE (__data_start, .)
+ *(.data)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+ .data          0x0000000000800060        0x0 main.o
+ .data          0x0000000000800060        0x0 lib/TM1637/TM1637Display.o
+ .data          0x0000000000800060        0x0 lib/ADC/ADC.o
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(floatsisf.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_inf.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_nan.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscA.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscB.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_round.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_split3.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_zero.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .data          0x0000000000800060        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+ *(.data*)
+ *(.rodata)
+ .rodata        0x0000000000800060       0x18 lib/TM1637/TM1637Display.o
+                0x0000000000800068                digitToSegment
+ *(.rodata*)
+ *(.gnu.linkonce.d*)
+                0x0000000000800078                . = ALIGN (0x2)
+                0x0000000000800078                _edata = .
+                0x0000000000800078                PROVIDE (__data_end, .)
+
+.bss            0x0000000000800078        0x2
+                0x0000000000800078                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x0000000000800078        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+ .bss           0x0000000000800078        0x1 main.o
+                0x0000000000800078                currentMode
+ .bss           0x0000000000800079        0x0 lib/TM1637/TM1637Display.o
+ .bss           0x0000000000800079        0x0 lib/ADC/ADC.o
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(floatsisf.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_inf.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_nan.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscA.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscB.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_round.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_split3.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_zero.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+ .bss           0x0000000000800079        0x0 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+ *(.bss*)
+ *(COMMON)
+ COMMON         0x0000000000800079        0x1 lib/TM1637/TM1637Display.o
+                0x0000000000800079                m_brightness
+                0x000000000080007a                PROVIDE (__bss_end, .)
+                0x0000000000000728                __data_load_start = LOADADDR (.data)
+                0x0000000000000740                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x000000000080007a        0x0
+                0x000000000080007a                PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                0x000000000080007a                PROVIDE (__noinit_end, .)
+                0x000000000080007a                _end = .
+                0x000000000080007a                PROVIDE (__heap_start, .)
+
+.eeprom         0x0000000000810000        0x0
+ *(.eeprom*)
+                0x0000000000810000                __eeprom_end = .
+
+.fuse
+ *(.fuse)
+ *(.lfuse)
+ *(.hfuse)
+ *(.efuse)
+
+.lock
+ *(.lock*)
+
+.signature
+ *(.signature*)
+
+.stab           0x0000000000000000      0x7e0
+ *(.stab)
+ .stab          0x0000000000000000      0x12c /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+ .stab          0x000000000000012c      0x138 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+                                        0x144 (size before relaxing)
+ .stab          0x0000000000000264      0x228 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+                                        0x234 (size before relaxing)
+ .stab          0x000000000000048c       0x6c /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+                                         0x78 (size before relaxing)
+ .stab          0x00000000000004f8       0xd8 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+                                         0xe4 (size before relaxing)
+ .stab          0x00000000000005d0       0xb4 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+                                         0xc0 (size before relaxing)
+ .stab          0x0000000000000684      0x15c /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+                                        0x168 (size before relaxing)
+
+.stabstr        0x0000000000000000      0x248
+ *(.stabstr)
+ .stabstr       0x0000000000000000      0x248 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x11
+ *(.comment)
+ .comment       0x0000000000000000       0x11 main.o
+                                         0x12 (size before relaxing)
+ .comment       0x0000000000000011       0x12 lib/TM1637/TM1637Display.o
+ .comment       0x0000000000000011       0x12 lib/ADC/ADC.o
+
+.note.gnu.build-id
+ *(.note.gnu.build-id)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x0000000000000000       0x60
+ *(.debug_aranges)
+ .debug_aranges
+                0x0000000000000000       0x20 main.o
+ .debug_aranges
+                0x0000000000000020       0x20 lib/TM1637/TM1637Display.o
+ .debug_aranges
+                0x0000000000000040       0x20 lib/ADC/ADC.o
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info     0x0000000000000000      0xf69
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x0000000000000000      0x420 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+ .debug_info    0x0000000000000420      0x2b1 main.o
+ .debug_info    0x00000000000006d1      0x71f lib/TM1637/TM1637Display.o
+ .debug_info    0x0000000000000df0      0x179 lib/ADC/ADC.o
+
+.debug_abbrev   0x0000000000000000      0x8cc
+ *(.debug_abbrev)
+ .debug_abbrev  0x0000000000000000      0x3e8 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+ .debug_abbrev  0x00000000000003e8      0x197 main.o
+ .debug_abbrev  0x000000000000057f      0x256 lib/TM1637/TM1637Display.o
+ .debug_abbrev  0x00000000000007d5       0xf7 lib/ADC/ADC.o
+
+.debug_line     0x0000000000000000      0x373
+ *(.debug_line .debug_line.* .debug_line_end)
+ .debug_line    0x0000000000000000       0x1d /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+ .debug_line    0x000000000000001d       0xf0 main.o
+ .debug_line    0x000000000000010d      0x1b9 lib/TM1637/TM1637Display.o
+ .debug_line    0x00000000000002c6       0xad lib/ADC/ADC.o
+
+.debug_frame    0x0000000000000000      0x1c4
+ *(.debug_frame)
+ .debug_frame   0x0000000000000000       0x24 main.o
+ .debug_frame   0x0000000000000024      0x118 lib/TM1637/TM1637Display.o
+ .debug_frame   0x000000000000013c       0x88 lib/ADC/ADC.o
+
+.debug_str      0x0000000000000000      0x4e7
+ *(.debug_str)
+ .debug_str     0x0000000000000000      0x169 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+ .debug_str     0x0000000000000169      0x212 main.o
+                                        0x24b (size before relaxing)
+ .debug_str     0x000000000000037b      0x114 lib/TM1637/TM1637Display.o
+                                        0x2cf (size before relaxing)
+ .debug_str     0x000000000000048f       0x58 lib/ADC/ADC.o
+                                        0x1c5 (size before relaxing)
+
+.debug_loc      0x0000000000000000      0x4e3
+ *(.debug_loc)
+ .debug_loc     0x0000000000000000       0x58 main.o
+ .debug_loc     0x0000000000000058      0x364 lib/TM1637/TM1637Display.o
+ .debug_loc     0x00000000000003bc      0x127 lib/ADC/ADC.o
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges   0x0000000000000000       0x40
+ *(.debug_ranges)
+ .debug_ranges  0x0000000000000000       0x10 main.o
+ .debug_ranges  0x0000000000000010       0x18 lib/TM1637/TM1637Display.o
+ .debug_ranges  0x0000000000000028       0x18 lib/ADC/ADC.o
+
+.debug_macro
+ *(.debug_macro)
+OUTPUT(Firmware.elf elf32-avr)
+LOAD linker stubs
+
+Cross Reference Table
+
+Symbol                                            File
+AdcGetMultiSample                                 lib/ADC/ADC.o
+                                                  main.o
+AdcGetSample                                      lib/ADC/ADC.o
+AdcInit                                           lib/ADC/ADC.o
+                                                  main.o
+AdcSetDifferentialInputMode                       lib/ADC/ADC.o
+                                                  main.o
+AdcSetSingleEndedMode                             lib/ADC/ADC.o
+TM1637DisplayBitDelay                             lib/TM1637/TM1637Display.o
+TM1637DisplayEncodeDigit                          lib/TM1637/TM1637Display.o
+TM1637DisplayInit                                 lib/TM1637/TM1637Display.o
+                                                  main.o
+TM1637DisplaySetBrightness                        lib/TM1637/TM1637Display.o
+                                                  main.o
+TM1637DisplaySetSegments                          lib/TM1637/TM1637Display.o
+TM1637DisplayShowNumberDec                        lib/TM1637/TM1637Display.o
+                                                  main.o
+TM1637DisplayStart                                lib/TM1637/TM1637Display.o
+TM1637DisplayStop                                 lib/TM1637/TM1637Display.o
+TM1637DisplayWriteByte                            lib/TM1637/TM1637Display.o
+__bad_interrupt                                   /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__bss_end                                         /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+__bss_start                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+__data_end                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+__data_load_start                                 /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+__data_start                                      /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+__divmodhi4                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+                                                  lib/TM1637/TM1637Display.o
+__divsf3                                          /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o)
+                                                  main.o
+__divsf3_pse                                      /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+__divsf3x                                         /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o)
+__do_clear_bss                                    /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_clear_bss.o)
+                                                  lib/TM1637/TM1637Display.o
+                                                  main.o
+__do_copy_data                                    /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_copy_data.o)
+                                                  lib/TM1637/TM1637Display.o
+__fixsfsi                                         /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o)
+                                                  main.o
+__fixunssfsi                                      /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o)
+__floatsisf                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(floatsisf.o)
+__floatunsisf                                     /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(floatsisf.o)
+                                                  main.o
+__fp_inf                                          /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_inf.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+__fp_nan                                          /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_nan.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+__fp_pscA                                         /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscA.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+__fp_pscB                                         /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_pscB.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+__fp_round                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_round.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3.o)
+__fp_split3                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_split3.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+__fp_splitA                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_split3.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o)
+__fp_szero                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_zero.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixsfsi.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(divsf3x.o)
+__fp_zero                                         /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fp_zero.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(fixunssfsi.o)
+__heap_end                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__init                                            /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__mulhi3                                          /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_mulhi3.o)
+                                                  lib/TM1637/TM1637Display.o
+__mulsf3                                          /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o)
+                                                  main.o
+__mulsf3_pse                                      /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+__mulsf3x                                         /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3x.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/libm.a(mulsf3.o)
+__stack                                           /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__udivmodhi4                                      /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodhi4.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+__udivmodsi4                                      /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_udivmodsi4.o)
+                                                  lib/ADC/ADC.o
+__vector_1                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_10                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_11                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_12                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_13                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_14                                       /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_2                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_3                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_4                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_5                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_6                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_7                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_8                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_9                                        /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vector_default                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+__vectors                                         /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+_div                                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_divmodhi4.o)
+_exit                                             /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+currentMode                                       main.o
+digitToSegment                                    lib/TM1637/TM1637Display.o
+exit                                              /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/avr25/libgcc.a(_exit.o)
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o
+m_brightness                                      lib/TM1637/TM1637Display.o
+main                                              main.o
+                                                  /usr/local/Cellar/avr-gcc/4.9.2/lib/gcc/avr/4.9.2/../../../../avr/lib/avr25/crttn85.o

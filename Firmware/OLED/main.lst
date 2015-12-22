@@ -1,0 +1,2033 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	__floatunsisf
+  11               	.global	__mulsf3
+  12               	.global	__divsf3
+  13               	.global	measureCurrent
+  15               	measureCurrent:
+  16               	.LFB7:
+  17               		.file 1 "main.c"
+   1:main.c        **** #include <util/delay.h>
+   2:main.c        **** 
+   3:main.c        **** #include "lib/ADC/ADC.h"
+   4:main.c        **** #include "lib/ssd1306xled/ssd1306xled.h"
+   5:main.c        **** #include "lib/ssd1306xled/ssd1306xled8x16.h"
+   6:main.c        **** #include "logo.h"
+   7:main.c        **** 
+   8:main.c        **** // Factor to calculate count number to µA in gain 20 differential mode
+   9:main.c        **** #define COUNT_TO_MA_GAINED (11.f * 1000.f) / (20.f * 1024.f)
+  10:main.c        **** 
+  11:main.c        **** // Factor to calculate count number to µA in no gain mode
+  12:main.c        **** #define COUNT_TO_MA (11.f * 1000.f) / (1024.f)
+  13:main.c        **** 
+  14:main.c        **** //Factor to calculate the count number to mV in single ended mode
+  15:main.c        **** #define R1 10.0f
+  16:main.c        **** #define R2 2.2f
+  17:main.c        **** #define VOLTAGE_DIVIDER_RATIO (R2) / ((R1) + (R2))
+  18:main.c        **** 
+  19:main.c        **** #define COUNT_TO_MV (1100.0f * (1/(VOLTAGE_DIVIDER_RATIO))) / (1024.f)
+  20:main.c        **** 
+  21:main.c        **** #define GAIN_SWITCH_THRESHOLD_UPPER 1000
+  22:main.c        **** #define GAIN_SWITCH_THRESHOLD_LOWER 40
+  23:main.c        **** 
+  24:main.c        **** //if we measure a voltage below this mV we can assume 
+  25:main.c        **** //the switch was pressed and pulled the line low
+  26:main.c        **** //if we would have a Vin of 2000mV we couldn't
+  27:main.c        **** //work correctly anyway so we can choose this value this high
+  28:main.c        **** #define SWITCH_PRESS_MEASURE_THRESHOLD 2000
+  29:main.c        **** 
+  30:main.c        **** typedef enum { I_GAIN,
+  31:main.c        ****     I_NOGAIN } Mode;
+  32:main.c        **** Mode currentMode = I_GAIN;
+  33:main.c        **** 
+  34:main.c        **** float measureCurrent()
+  35:main.c        **** {
+  18               		.loc 1 35 0
+  19               		.cfi_startproc
+  20 0000 CF92      		push r12
+  21               	.LCFI0:
+  22               		.cfi_def_cfa_offset 3
+  23               		.cfi_offset 12, -2
+  24 0002 DF92      		push r13
+  25               	.LCFI1:
+  26               		.cfi_def_cfa_offset 4
+  27               		.cfi_offset 13, -3
+  28 0004 EF92      		push r14
+  29               	.LCFI2:
+  30               		.cfi_def_cfa_offset 5
+  31               		.cfi_offset 14, -4
+  32 0006 FF92      		push r15
+  33               	.LCFI3:
+  34               		.cfi_def_cfa_offset 6
+  35               		.cfi_offset 15, -5
+  36 0008 1F93      		push r17
+  37               	.LCFI4:
+  38               		.cfi_def_cfa_offset 7
+  39               		.cfi_offset 17, -6
+  40 000a CF93      		push r28
+  41               	.LCFI5:
+  42               		.cfi_def_cfa_offset 8
+  43               		.cfi_offset 28, -7
+  44 000c DF93      		push r29
+  45               	.LCFI6:
+  46               		.cfi_def_cfa_offset 9
+  47               		.cfi_offset 29, -8
+  48               	/* prologue: function */
+  49               	/* frame size = 0 */
+  50               	/* stack size = 7 */
+  51               	.L__stack_usage = 7
+  36:main.c        ****     // configure the ADC to the current Mode
+  37:main.c        ****     if (currentMode == I_GAIN) {
+  52               		.loc 1 37 0
+  53 000e 8091 0000 		lds r24,currentMode
+  54 0012 8111      		cpse r24,__zero_reg__
+  55 0014 00C0      		rjmp .L2
+  38:main.c        ****         AdcSetDifferentialInputMode(true);
+  56               		.loc 1 38 0
+  57 0016 81E0      		ldi r24,lo8(1)
+  58 0018 00C0      		rjmp .L11
+  59               	.L2:
+  39:main.c        ****     }
+  40:main.c        ****     else if (currentMode == I_NOGAIN) {
+  60               		.loc 1 40 0
+  61 001a 8130      		cpi r24,lo8(1)
+  62 001c 01F4      		brne .L3
+  41:main.c        ****         AdcSetDifferentialInputMode(false);
+  63               		.loc 1 41 0
+  64 001e 80E0      		ldi r24,0
+  65               	.L11:
+  66 0020 00D0      		rcall AdcSetDifferentialInputMode
+  67               	.LVL0:
+  68               	.L3:
+  42:main.c        ****     }
+  43:main.c        **** 
+  44:main.c        ****     uint16_t countNumber = AdcGetMultiSample(10);
+  69               		.loc 1 44 0
+  70 0022 8AE0      		ldi r24,lo8(10)
+  71 0024 00D0      		rcall AdcGetMultiSample
+  72               	.LVL1:
+  73 0026 EC01      		movw r28,r24
+  74               	.LVL2:
+  45:main.c        **** 
+  46:main.c        ****     float microUnit;
+  47:main.c        ****     if (currentMode == I_GAIN) {
+  75               		.loc 1 47 0
+  76 0028 1091 0000 		lds r17,currentMode
+  77 002c 1111      		cpse r17,__zero_reg__
+  78 002e 00C0      		rjmp .L4
+  48:main.c        ****         microUnit = countNumber * COUNT_TO_MA_GAINED;
+  79               		.loc 1 48 0
+  80 0030 BC01      		movw r22,r24
+  81 0032 80E0      		ldi r24,0
+  82 0034 90E0      		ldi r25,0
+  83               	.LVL3:
+  84 0036 00D0      		rcall __floatunsisf
+  85               	.LVL4:
+  86 0038 20E0      		ldi r18,0
+  87 003a 30EE      		ldi r19,lo8(-32)
+  88 003c 4BE2      		ldi r20,lo8(43)
+  89 003e 56E4      		ldi r21,lo8(70)
+  90 0040 00D0      		rcall __mulsf3
+  91               	.LVL5:
+  92 0042 20E0      		ldi r18,0
+  93 0044 30E0      		ldi r19,0
+  94 0046 40EA      		ldi r20,lo8(-96)
+  95 0048 56E4      		ldi r21,lo8(70)
+  96 004a 00D0      		rcall __divsf3
+  97               	.LVL6:
+  98 004c 6B01      		movw r12,r22
+  99 004e 7C01      		movw r14,r24
+ 100               	.LVL7:
+  49:main.c        ****     }
+  50:main.c        ****     else if (currentMode == I_NOGAIN) {
+  51:main.c        ****         microUnit = countNumber * COUNT_TO_MA;
+  52:main.c        ****     }
+  53:main.c        **** 
+  54:main.c        ****     // handle the ranging of the gain and no-gain mode
+  55:main.c        ****     if (countNumber > GAIN_SWITCH_THRESHOLD_UPPER && currentMode == I_GAIN) {
+ 101               		.loc 1 55 0
+ 102 0050 C93E      		cpi r28,-23
+ 103 0052 D340      		sbci r29,3
+ 104 0054 00F0      		brlo .L9
+  56:main.c        ****         currentMode = I_NOGAIN;
+ 105               		.loc 1 56 0
+ 106 0056 81E0      		ldi r24,lo8(1)
+ 107 0058 8093 0000 		sts currentMode,r24
+ 108 005c 00C0      		rjmp .L9
+ 109               	.LVL8:
+ 110               	.L4:
+  50:main.c        ****         microUnit = countNumber * COUNT_TO_MA;
+ 111               		.loc 1 50 0
+ 112 005e 1130      		cpi r17,lo8(1)
+ 113 0060 01F4      		brne .L7
+  51:main.c        ****     }
+ 114               		.loc 1 51 0
+ 115 0062 BC01      		movw r22,r24
+ 116 0064 80E0      		ldi r24,0
+ 117 0066 90E0      		ldi r25,0
+ 118               	.LVL9:
+ 119 0068 00D0      		rcall __floatunsisf
+ 120               	.LVL10:
+ 121 006a 20E0      		ldi r18,0
+ 122 006c 30EE      		ldi r19,lo8(-32)
+ 123 006e 4BE2      		ldi r20,lo8(43)
+ 124 0070 56E4      		ldi r21,lo8(70)
+ 125 0072 00D0      		rcall __mulsf3
+ 126               	.LVL11:
+ 127 0074 20E0      		ldi r18,0
+ 128 0076 30E0      		ldi r19,0
+ 129 0078 40E8      		ldi r20,lo8(-128)
+ 130 007a 5AE3      		ldi r21,lo8(58)
+ 131 007c 00D0      		rcall __mulsf3
+ 132               	.LVL12:
+ 133 007e 6B01      		movw r12,r22
+ 134 0080 7C01      		movw r14,r24
+ 135               	.LVL13:
+ 136               	.L7:
+  55:main.c        ****         currentMode = I_NOGAIN;
+ 137               		.loc 1 55 0
+ 138 0082 C93E      		cpi r28,-23
+ 139 0084 83E0      		ldi r24,3
+ 140 0086 D807      		cpc r29,r24
+ 141 0088 00F4      		brsh .L9
+  57:main.c        ****     }
+  58:main.c        ****     else if (countNumber <= GAIN_SWITCH_THRESHOLD_LOWER && currentMode == I_NOGAIN) {
+ 142               		.loc 1 58 0
+ 143 008a A997      		sbiw r28,41
+ 144 008c 00F4      		brsh .L9
+ 145               		.loc 1 58 0 is_stmt 0 discriminator 1
+ 146 008e 1130      		cpi r17,lo8(1)
+ 147 0090 01F4      		brne .L9
+  59:main.c        ****         currentMode = I_GAIN;
+ 148               		.loc 1 59 0 is_stmt 1
+ 149 0092 1092 0000 		sts currentMode,__zero_reg__
+ 150               	.L9:
+  60:main.c        ****     }
+  61:main.c        **** 
+  62:main.c        ****     return microUnit;
+  63:main.c        **** }
+ 151               		.loc 1 63 0
+ 152 0096 C701      		movw r24,r14
+ 153 0098 B601      		movw r22,r12
+ 154               	/* epilogue start */
+ 155 009a DF91      		pop r29
+ 156 009c CF91      		pop r28
+ 157               	.LVL14:
+ 158 009e 1F91      		pop r17
+ 159 00a0 FF90      		pop r15
+ 160 00a2 EF90      		pop r14
+ 161 00a4 DF90      		pop r13
+ 162 00a6 CF90      		pop r12
+ 163               	.LVL15:
+ 164 00a8 0895      		ret
+ 165               		.cfi_endproc
+ 166               	.LFE7:
+ 168               	.global	__fixunssfsi
+ 169               	.global	measureVoltage
+ 171               	measureVoltage:
+ 172               	.LFB8:
+  64:main.c        **** 
+  65:main.c        **** uint32_t measureVoltage() { 
+ 173               		.loc 1 65 0
+ 174               		.cfi_startproc
+ 175               	/* prologue: function */
+ 176               	/* frame size = 0 */
+ 177               	/* stack size = 0 */
+ 178               	.L__stack_usage = 0
+  66:main.c        ****     //switch to single ended mode on the VIN channel
+  67:main.c        ****     AdcSetSingleEndedMode(1); 
+ 179               		.loc 1 67 0
+ 180 00aa 81E0      		ldi r24,lo8(1)
+ 181 00ac 00D0      		rcall AdcSetSingleEndedMode
+ 182               	.LVL16:
+  68:main.c        **** 
+  69:main.c        ****     //take the measurement
+  70:main.c        ****     uint16_t countNumber = AdcGetMultiSample(10);
+ 183               		.loc 1 70 0
+ 184 00ae 8AE0      		ldi r24,lo8(10)
+ 185 00b0 00D0      		rcall AdcGetMultiSample
+ 186               	.LVL17:
+  71:main.c        **** 
+  72:main.c        ****     float microUnit = countNumber * COUNT_TO_MV;
+ 187               		.loc 1 72 0
+ 188 00b2 BC01      		movw r22,r24
+ 189 00b4 80E0      		ldi r24,0
+ 190 00b6 90E0      		ldi r25,0
+ 191               	.LVL18:
+ 192 00b8 00D0      		rcall __floatunsisf
+ 193               	.LVL19:
+ 194 00ba 20E0      		ldi r18,0
+ 195 00bc 30EA      		ldi r19,lo8(-96)
+ 196 00be 4EEB      		ldi r20,lo8(-66)
+ 197 00c0 55E4      		ldi r21,lo8(69)
+ 198 00c2 00D0      		rcall __mulsf3
+ 199               	.LVL20:
+ 200 00c4 20E0      		ldi r18,0
+ 201 00c6 30E0      		ldi r19,0
+ 202 00c8 40E8      		ldi r20,lo8(-128)
+ 203 00ca 5AE3      		ldi r21,lo8(58)
+ 204 00cc 00D0      		rcall __mulsf3
+ 205               	.LVL21:
+  73:main.c        **** 
+  74:main.c        ****     return microUnit;
+ 206               		.loc 1 74 0
+ 207 00ce 00D0      		rcall __fixunssfsi
+ 208               	.LVL22:
+  75:main.c        **** }
+ 209               		.loc 1 75 0
+ 210 00d0 0895      		ret
+ 211               		.cfi_endproc
+ 212               	.LFE8:
+ 214               		.section	.rodata.str1.1,"aMS",@progbits,1
+ 215               	.LC0:
+ 216 0000 2020 2020 		.string	"        "
+ 216      2020 2020 
+ 216      00
+ 217               		.text
+ 218               	.global	cleanLine
+ 220               	cleanLine:
+ 221               	.LFB9:
+  76:main.c        **** 
+  77:main.c        **** void cleanLine(uint8_t posY, uint8_t numchars){
+ 222               		.loc 1 77 0
+ 223               		.cfi_startproc
+ 224               	.LVL23:
+ 225 00d2 CF93      		push r28
+ 226               	.LCFI7:
+ 227               		.cfi_def_cfa_offset 3
+ 228               		.cfi_offset 28, -2
+ 229 00d4 DF93      		push r29
+ 230               	.LCFI8:
+ 231               		.cfi_def_cfa_offset 4
+ 232               		.cfi_offset 29, -3
+ 233               	/* prologue: function */
+ 234               	/* frame size = 0 */
+ 235               	/* stack size = 2 */
+ 236               	.L__stack_usage = 2
+ 237 00d6 D82F      		mov r29,r24
+  78:main.c        ****     //clean the line
+  79:main.c        ****     uint8_t posX = 26 + numchars * 8;
+ 238               		.loc 1 79 0
+ 239 00d8 C62F      		mov r28,r22
+ 240 00da CC0F      		lsl r28
+ 241 00dc CC0F      		lsl r28
+ 242 00de CC0F      		lsl r28
+ 243               	.LVL24:
+  80:main.c        ****     ssd1306_setpos(posX, posY);
+ 244               		.loc 1 80 0
+ 245 00e0 682F      		mov r22,r24
+ 246               	.LVL25:
+ 247 00e2 8AE1      		ldi r24,lo8(26)
+ 248               	.LVL26:
+ 249 00e4 8C0F      		add r24,r28
+ 250               	.LVL27:
+ 251 00e6 00D0      		rcall ssd1306_setpos
+ 252               	.LVL28:
+  81:main.c        ****     ssd1306_string_font6x8("        ");
+ 253               		.loc 1 81 0
+ 254 00e8 80E0      		ldi r24,lo8(.LC0)
+ 255 00ea 90E0      		ldi r25,hi8(.LC0)
+ 256 00ec 00D0      		rcall ssd1306_string_font6x8
+ 257               	.LVL29:
+  82:main.c        ****     ssd1306_setpos(posX + 12, posY + 1);
+ 258               		.loc 1 82 0
+ 259 00ee 61E0      		ldi r22,lo8(1)
+ 260 00f0 6D0F      		add r22,r29
+ 261 00f2 86E2      		ldi r24,lo8(38)
+ 262 00f4 8C0F      		add r24,r28
+ 263 00f6 00D0      		rcall ssd1306_setpos
+ 264               	.LVL30:
+  83:main.c        ****     ssd1306_string_font6x8("        ");
+ 265               		.loc 1 83 0
+ 266 00f8 80E0      		ldi r24,lo8(.LC0)
+ 267 00fa 90E0      		ldi r25,hi8(.LC0)
+ 268               	/* epilogue start */
+  84:main.c        **** }
+ 269               		.loc 1 84 0
+ 270 00fc DF91      		pop r29
+ 271               	.LVL31:
+ 272 00fe CF91      		pop r28
+ 273               	.LVL32:
+  83:main.c        ****     ssd1306_string_font6x8("        ");
+ 274               		.loc 1 83 0
+ 275 0100 00C0      		rjmp ssd1306_string_font6x8
+ 276               	.LVL33:
+ 277               		.cfi_endproc
+ 278               	.LFE9:
+ 280               	.global	__ltsf2
+ 281               	.global	__gtsf2
+ 282               	.global	__fixsfsi
+ 283               		.section	.rodata.str1.1
+ 284               	.LC1:
+ 285 0009 5520 3D00 		.string	"U ="
+ 286               	.LC2:
+ 287 000d 6D56 00   		.string	"mV"
+ 288               	.LC3:
+ 289 0010 4920 3D00 		.string	"I ="
+ 290               	.LC4:
+ 291 0014 6D41 00   		.string	"mA"
+ 292               	.LC5:
+ 293 0017 2028 7832 		.string	" (x20)"
+ 293      3029 00
+ 294               	.LC6:
+ 295 001e 5020 3D00 		.string	"P ="
+ 296               	.LC7:
+ 297 0022 6D57 00   		.string	"mW"
+ 298               		.section	.text.startup,"ax",@progbits
+ 299               	.global	main
+ 301               	main:
+ 302               	.LFB10:
+  85:main.c        **** 
+  86:main.c        **** int main()
+  87:main.c        **** {
+ 303               		.loc 1 87 0
+ 304               		.cfi_startproc
+ 305 0000 CF93      		push r28
+ 306               	.LCFI9:
+ 307               		.cfi_def_cfa_offset 3
+ 308               		.cfi_offset 28, -2
+ 309 0002 DF93      		push r29
+ 310               	.LCFI10:
+ 311               		.cfi_def_cfa_offset 4
+ 312               		.cfi_offset 29, -3
+ 313 0004 CDB7      		in r28,__SP_L__
+ 314 0006 DEB7      		in r29,__SP_H__
+ 315               	.LCFI11:
+ 316               		.cfi_def_cfa_register 28
+ 317 0008 E197      		sbiw r28,49
+ 318               	.LCFI12:
+ 319               		.cfi_def_cfa_offset 53
+ 320 000a 0FB6      		in __tmp_reg__,__SREG__
+ 321 000c F894      		cli
+ 322 000e DEBF      		out __SP_H__,r29
+ 323 0010 0FBE      		out __SREG__,__tmp_reg__
+ 324 0012 CDBF      		out __SP_L__,r28
+ 325               	/* prologue: function */
+ 326               	/* frame size = 49 */
+ 327               	/* stack size = 51 */
+ 328               	.L__stack_usage = 51
+  88:main.c        ****     static buttonPressed = 0;
+  89:main.c        ****     AdcInit();
+ 329               		.loc 1 89 0
+ 330 0014 00D0      		rcall AdcInit
+ 331               	.LVL34:
+ 332               	.LBB7:
+ 333               	.LBB8:
+ 334               		.file 2 "/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h"
+   1:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /* Copyright (c) 2002, Marek Michalkiewicz
+   2:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Copyright (c) 2004,2005,2007 Joerg Wunsch
+   3:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Copyright (c) 2007  Florin-Viorel Petrov
+   4:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    All rights reserved.
+   5:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+   6:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Redistribution and use in source and binary forms, with or without
+   7:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    modification, are permitted provided that the following conditions are met:
+   8:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+   9:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    * Redistributions of source code must retain the above copyright
+  10:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer.
+  11:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  12:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    * Redistributions in binary form must reproduce the above copyright
+  13:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      notice, this list of conditions and the following disclaimer in
+  14:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      the documentation and/or other materials provided with the
+  15:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      distribution.
+  16:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  17:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    * Neither the name of the copyright holders nor the names of
+  18:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      contributors may be used to endorse or promote products derived
+  19:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****      from this software without specific prior written permission.
+  20:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  21:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  22:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  23:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  24:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  25:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  26:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  27:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  28:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  29:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  30:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  31:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   POSSIBILITY OF SUCH DAMAGE. */
+  32:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  33:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /* $Id: delay.h.in 2385 2013-05-03 13:14:20Z joerg_wunsch $ */
+  34:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  35:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #ifndef _UTIL_DELAY_H_
+  36:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #define _UTIL_DELAY_H_ 1
+  37:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  38:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #ifndef __HAS_DELAY_CYCLES
+  39:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #define __HAS_DELAY_CYCLES 1
+  40:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+  41:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  42:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #include <inttypes.h>
+  43:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #include <util/delay_basic.h>
+  44:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #include <math.h>
+  45:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  46:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /** \file */
+  47:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /** \defgroup util_delay <util/delay.h>: Convenience functions for busy-wait delay loops
+  48:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     \code
+  49:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     #define F_CPU 1000000UL  // 1 MHz
+  50:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     //#define F_CPU 14.7456E6
+  51:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     #include <util/delay.h>
+  52:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     \endcode
+  53:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  54:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     \note As an alternative method, it is possible to pass the
+  55:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     F_CPU macro down to the compiler from the Makefile.
+  56:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     Obviously, in that case, no \c \#define statement should be
+  57:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     used.
+  58:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  59:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     The functions in this header file are wrappers around the basic
+  60:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     busy-wait functions from <util/delay_basic.h>.  They are meant as
+  61:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     convenience functions where actual time values can be specified
+  62:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     rather than a number of cycles to wait for.  The idea behind is
+  63:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     that compile-time constant expressions will be eliminated by
+  64:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     compiler optimization so floating-point expressions can be used
+  65:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     to calculate the number of delay cycles needed based on the CPU
+  66:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     frequency passed by the macro F_CPU.
+  67:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  68:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     \note In order for these functions to work as intended, compiler
+  69:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     optimizations <em>must</em> be enabled, and the delay time
+  70:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     <em>must</em> be an expression that is a known constant at
+  71:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     compile-time.  If these requirements are not met, the resulting
+  72:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     delay will be much longer (and basically unpredictable), and
+  73:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     applications that otherwise do not use floating-point calculations
+  74:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     will experience severe code bloat by the floating-point library
+  75:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     routines linked into the application.
+  76:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  77:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     The functions available allow the specification of microsecond, and
+  78:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     millisecond delays directly, using the application-supplied macro
+  79:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     F_CPU as the CPU clock frequency (in Hertz).
+  80:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  81:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** */
+  82:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  83:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #if !defined(__DOXYGEN__)
+  84:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** static inline void _delay_us(double __us) __attribute__((always_inline));
+  85:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** static inline void _delay_ms(double __ms) __attribute__((always_inline));
+  86:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+  87:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  88:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #ifndef F_CPU
+  89:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /* prevent compiler error by supplying a default */
+  90:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** # warning "F_CPU not defined for <util/delay.h>"
+  91:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** # define F_CPU 1000000UL
+  92:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+  93:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  94:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #ifndef __OPTIMIZE__
+  95:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** # warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+  96:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+  97:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+  98:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+  99:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 100:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 101:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #  include <math.h>
+ 102:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #endif
+ 103:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 104:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** /**
+ 105:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    \ingroup util_delay
+ 106:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 107:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Perform a delay of \c __ms milliseconds, using _delay_loop_2().
+ 108:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 109:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    The macro F_CPU is supposed to be defined to a
+ 110:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    constant defining the CPU clock frequency (in Hertz).
+ 111:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 112:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    The maximal possible delay is 262.14 ms / F_CPU in MHz.
+ 113:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 114:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    When the user request delay which exceed the maximum possible one,
+ 115:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    _delay_ms() provides a decreased resolution functionality. In this
+ 116:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    mode _delay_ms() will work with a resolution of 1/10 ms, providing
+ 117:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    delays up to 6.5535 seconds (independent from CPU frequency).  The
+ 118:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    user will not be informed about decreased resolution.
+ 119:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 120:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    If the avr-gcc toolchain has __builtin_avr_delay_cycles(unsigned long)
+ 121:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    support, maximal possible delay is 4294967.295 ms/ F_CPU in MHz. For
+ 122:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    values greater than the maximal possible delay, overflows results in
+ 123:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    no delay i.e., 0ms.
+ 124:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 125:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Conversion of __us into clock cycles may not always result in integer.
+ 126:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    By default, the clock cycles rounded up to next integer. This ensures that
+ 127:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    the user gets atleast __us microseconds of delay.
+ 128:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 129:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Alternatively, user can define __DELAY_ROUND_DOWN__ and __DELAY_ROUND_CLOSEST__
+ 130:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    to round down and round to closest integer.
+ 131:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 132:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Note: The new implementation of _delay_ms(double __ms) with 
+ 133:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****     __builtin_avr_delay_cycles(unsigned long) support is not backward compatible. 
+ 134:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    User can define __DELAY_BACKWARD_COMPATIBLE__ to get a backward compatible delay.
+ 135:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    Also, the backward compatible
+ 136:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    algorithm will be chosen if the code is compiled in a <em>freestanding
+ 137:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    environment</em> (GCC option \c -ffreestanding), as the math functions
+ 138:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****    required for rounding are not available to the compiler then.
+ 139:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 140:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****  */
+ 141:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** void
+ 142:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** _delay_ms(double __ms)
+ 143:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** {
+ 144:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	double __tmp ; 
+ 145:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** #if __HAS_DELAY_CYCLES && defined(__OPTIMIZE__) && \
+ 146:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   !defined(__DELAY_BACKWARD_COMPATIBLE__) &&	   \
+ 147:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h ****   __STDC_HOSTED__
+ 148:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	uint32_t __ticks_dc;
+ 149:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	extern void __builtin_avr_delay_cycles(unsigned long);
+ 150:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	__tmp = ((F_CPU) / 1e3) * __ms;
+ 151:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 152:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#if defined(__DELAY_ROUND_DOWN__)
+ 153:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)fabs(__tmp);
+ 154:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 155:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#elif defined(__DELAY_ROUND_CLOSEST__)
+ 156:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(fabs(__tmp)+0.5);
+ 157:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 158:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#else
+ 159:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		//round up by default
+ 160:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+ 161:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	#endif
+ 162:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 
+ 163:/usr/local/Cellar/avr-gcc/4.9.2/avr/include/util/delay.h **** 	__builtin_avr_delay_cycles(__ticks_dc);
+ 335               		.loc 2 163 0
+ 336 0016 87EA      		ldi r24,lo8(24999)
+ 337 0018 91E6      		ldi r25,hi8(24999)
+ 338 001a 0197      		1: sbiw r24,1
+ 339 001c 01F4      		brne 1b
+ 340 001e 00C0      		rjmp .
+ 341 0020 0000      		nop
+ 342               	.LBE8:
+ 343               	.LBE7:
+  90:main.c        **** 
+  91:main.c        ****     _delay_ms(100);
+  92:main.c        ****     ssd1306_init();
+ 344               		.loc 1 92 0
+ 345 0022 00D0      		rcall ssd1306_init
+ 346               	.LVL35:
+  93:main.c        **** 
+  94:main.c        ****     ssd1306_fill(0x00); // Clear screen
+ 347               		.loc 1 94 0
+ 348 0024 80E0      		ldi r24,0
+ 349 0026 00D0      		rcall ssd1306_fill
+ 350               	.LVL36:
+  95:main.c        ****     ssd1306_draw_bmp(0, 0, 125, 8, logo);
+ 351               		.loc 1 95 0
+ 352 0028 00E0      		ldi r16,lo8(logo)
+ 353 002a 10E0      		ldi r17,hi8(logo)
+ 354 002c 28E0      		ldi r18,lo8(8)
+ 355 002e 4DE7      		ldi r20,lo8(125)
+ 356 0030 60E0      		ldi r22,0
+ 357 0032 80E0      		ldi r24,0
+ 358 0034 00D0      		rcall ssd1306_draw_bmp
+ 359               	.LVL37:
+ 360               	.LBB9:
+ 361               	.LBB10:
+ 362               		.loc 2 163 0
+ 363 0036 9FE3      		ldi r25,lo8(199999)
+ 364 0038 2DE0      		ldi r18,hi8(199999)
+ 365 003a 83E0      		ldi r24,hlo8(199999)
+ 366 003c 9150      		1: subi r25,1
+ 367 003e 2040      		sbci r18,0
+ 368 0040 8040      		sbci r24,0
+ 369 0042 01F4      		brne 1b
+ 370 0044 00C0      		rjmp .
+ 371 0046 0000      		nop
+ 372               	.LBE10:
+ 373               	.LBE9:
+  96:main.c        ****     _delay_ms(1000);
+  97:main.c        ****     ssd1306_fill(0x00); // Clear screen
+ 374               		.loc 1 97 0
+ 375 0048 80E0      		ldi r24,0
+ 376 004a 00D0      		rcall ssd1306_fill
+ 377               	.LVL38:
+ 378               	.LBB11:
+  98:main.c        **** 
+  99:main.c        ****     while (1) {
+ 100:main.c        **** 
+ 101:main.c        ****         //take the measurements
+ 102:main.c        ****         float currentVoltage = measureVoltage();
+ 103:main.c        ****         float currentCurrent = measureCurrent();
+ 104:main.c        ****         float currentPower = (currentVoltage / 1000) * (currentCurrent);
+ 105:main.c        **** 
+ 106:main.c        ****         //use the voltage measurement to determine if the switch was pressed
+ 107:main.c        ****         if(currentVoltage < SWITCH_PRESS_MEASURE_THRESHOLD && !buttonPressed){
+ 108:main.c        ****             ssd1306_flip();
+ 109:main.c        ****             buttonPressed = 1;
+ 110:main.c        ****             continue;
+ 111:main.c        ****         }else if (currentVoltage > SWITCH_PRESS_MEASURE_THRESHOLD && buttonPressed){
+ 112:main.c        ****             //reset the debounce state as soon as we measure 
+ 113:main.c        ****             //a high enough value again to be sure the button 
+ 114:main.c        ****             //was released
+ 115:main.c        ****             buttonPressed = 0;
+ 116:main.c        ****         }
+ 117:main.c        ****         
+ 118:main.c        ****         //convert the measurements to a string
+ 119:main.c        ****         char voltageString[15];
+ 120:main.c        ****         itoa((int)currentVoltage, voltageString, 10);
+ 379               		.loc 1 120 0
+ 380 004c 3E01      		movw r6,r28
+ 381 004e 9FE1      		ldi r25,31
+ 382 0050 690E      		add r6,r25
+ 383 0052 711C      		adc r7,__zero_reg__
+ 121:main.c        **** 
+ 122:main.c        ****         char currentString[15];
+ 123:main.c        ****         itoa((int)currentCurrent, currentString, 10);
+ 384               		.loc 1 123 0
+ 385 0054 1E01      		movw r2,r28
+ 386 0056 20E1      		ldi r18,16
+ 387 0058 220E      		add r2,r18
+ 388 005a 311C      		adc r3,__zero_reg__
+ 124:main.c        **** 
+ 125:main.c        ****         char powerString[15];
+ 126:main.c        ****         itoa((int)currentPower, powerString, 10);
+ 389               		.loc 1 126 0
+ 390 005c 8E01      		movw r16,r28
+ 391 005e 0F5F      		subi r16,-1
+ 392 0060 1F4F      		sbci r17,-1
+ 109:main.c        ****             continue;
+ 393               		.loc 1 109 0
+ 394 0062 4424      		clr r4
+ 395 0064 4394      		inc r4
+ 396 0066 512C      		mov r5,__zero_reg__
+ 397               	.L16:
+ 102:main.c        ****         float currentCurrent = measureCurrent();
+ 398               		.loc 1 102 0
+ 399 0068 00D0      		rcall measureVoltage
+ 400               	.LVL39:
+ 401 006a 00D0      		rcall __floatunsisf
+ 402               	.LVL40:
+ 403 006c 6B01      		movw r12,r22
+ 404 006e 7C01      		movw r14,r24
+ 405               	.LVL41:
+ 103:main.c        ****         float currentPower = (currentVoltage / 1000) * (currentCurrent);
+ 406               		.loc 1 103 0
+ 407 0070 00D0      		rcall measureCurrent
+ 408               	.LVL42:
+ 409 0072 4B01      		movw r8,r22
+ 410 0074 5C01      		movw r10,r24
+ 411               	.LVL43:
+ 104:main.c        **** 
+ 412               		.loc 1 104 0
+ 413 0076 20E0      		ldi r18,0
+ 414 0078 30E0      		ldi r19,0
+ 415 007a 4AE7      		ldi r20,lo8(122)
+ 416 007c 54E4      		ldi r21,lo8(68)
+ 417 007e C701      		movw r24,r14
+ 418 0080 B601      		movw r22,r12
+ 419 0082 00D0      		rcall __divsf3
+ 420               	.LVL44:
+ 421 0084 A501      		movw r20,r10
+ 422 0086 9401      		movw r18,r8
+ 423 0088 00D0      		rcall __mulsf3
+ 424               	.LVL45:
+ 425 008a 6EA7      		std Y+46,r22
+ 426 008c 7FA7      		std Y+47,r23
+ 427 008e 88AB      		std Y+48,r24
+ 428 0090 99AB      		std Y+49,r25
+ 429               	.LVL46:
+ 107:main.c        ****             ssd1306_flip();
+ 430               		.loc 1 107 0
+ 431 0092 20E0      		ldi r18,0
+ 432 0094 30E0      		ldi r19,0
+ 433 0096 4AEF      		ldi r20,lo8(-6)
+ 434 0098 54E4      		ldi r21,lo8(68)
+ 435 009a C701      		movw r24,r14
+ 436 009c B601      		movw r22,r12
+ 437               	.LVL47:
+ 438 009e 00D0      		rcall __ltsf2
+ 439               	.LVL48:
+ 440 00a0 87FF      		sbrs r24,7
+ 441 00a2 00C0      		rjmp .L30
+ 107:main.c        ****             ssd1306_flip();
+ 442               		.loc 1 107 0 is_stmt 0 discriminator 1
+ 443 00a4 8091 0000 		lds r24,buttonPressed.1872
+ 444 00a8 9091 0000 		lds r25,buttonPressed.1872+1
+ 445 00ac 892B      		or r24,r25
+ 446 00ae 01F0      		breq .+2
+ 447 00b0 00C0      		rjmp .L19
+ 108:main.c        ****             buttonPressed = 1;
+ 448               		.loc 1 108 0 is_stmt 1
+ 449 00b2 00D0      		rcall ssd1306_flip
+ 450               	.LVL49:
+ 109:main.c        ****             continue;
+ 451               		.loc 1 109 0
+ 452 00b4 5092 0000 		sts buttonPressed.1872+1,r5
+ 453 00b8 4092 0000 		sts buttonPressed.1872,r4
+ 454 00bc 00C0      		rjmp .L16
+ 455               	.L30:
+ 111:main.c        ****             //reset the debounce state as soon as we measure 
+ 456               		.loc 1 111 0
+ 457 00be 20E0      		ldi r18,0
+ 458 00c0 30E0      		ldi r19,0
+ 459 00c2 4AEF      		ldi r20,lo8(-6)
+ 460 00c4 54E4      		ldi r21,lo8(68)
+ 461 00c6 C701      		movw r24,r14
+ 462 00c8 B601      		movw r22,r12
+ 463 00ca 00D0      		rcall __gtsf2
+ 464               	.LVL50:
+ 465 00cc 1816      		cp __zero_reg__,r24
+ 466 00ce 04F4      		brge .L21
+ 111:main.c        ****             //reset the debounce state as soon as we measure 
+ 467               		.loc 1 111 0 is_stmt 0 discriminator 1
+ 468 00d0 8091 0000 		lds r24,buttonPressed.1872
+ 469 00d4 9091 0000 		lds r25,buttonPressed.1872+1
+ 470 00d8 892B      		or r24,r25
+ 471 00da 01F0      		breq .L21
+ 472               	.L24:
+ 115:main.c        ****         }
+ 473               		.loc 1 115 0 is_stmt 1
+ 474 00dc 1092 0000 		sts buttonPressed.1872+1,__zero_reg__
+ 475 00e0 1092 0000 		sts buttonPressed.1872,__zero_reg__
+ 476               	.L21:
+ 120:main.c        **** 
+ 477               		.loc 1 120 0
+ 478 00e4 C701      		movw r24,r14
+ 479 00e6 B601      		movw r22,r12
+ 480 00e8 00D0      		rcall __fixsfsi
+ 481               	.LVL51:
+ 482 00ea DC01      		movw r26,r24
+ 483 00ec CB01      		movw r24,r22
+ 484 00ee 4AE0      		ldi r20,lo8(10)
+ 485 00f0 50E0      		ldi r21,0
+ 486 00f2 B301      		movw r22,r6
+ 487 00f4 00D0      		rcall itoa
+ 488               	.LVL52:
+ 123:main.c        **** 
+ 489               		.loc 1 123 0
+ 490 00f6 C501      		movw r24,r10
+ 491 00f8 B401      		movw r22,r8
+ 492 00fa 00D0      		rcall __fixsfsi
+ 493               	.LVL53:
+ 494 00fc DC01      		movw r26,r24
+ 495 00fe CB01      		movw r24,r22
+ 496 0100 4AE0      		ldi r20,lo8(10)
+ 497 0102 50E0      		ldi r21,0
+ 498 0104 B101      		movw r22,r2
+ 499 0106 00D0      		rcall itoa
+ 500               	.LVL54:
+ 501               		.loc 1 126 0
+ 502 0108 6EA5      		ldd r22,Y+46
+ 503 010a 7FA5      		ldd r23,Y+47
+ 504 010c 88A9      		ldd r24,Y+48
+ 505 010e 99A9      		ldd r25,Y+49
+ 506 0110 00D0      		rcall __fixsfsi
+ 507               	.LVL55:
+ 508 0112 DC01      		movw r26,r24
+ 509 0114 CB01      		movw r24,r22
+ 510 0116 4AE0      		ldi r20,lo8(10)
+ 511 0118 50E0      		ldi r21,0
+ 512 011a B801      		movw r22,r16
+ 513 011c 00D0      		rcall itoa
+ 514               	.LVL56:
+ 127:main.c        **** 
+ 128:main.c        ****         //draw the voltage
+ 129:main.c        ****         ssd1306_setpos(0, 1);
+ 515               		.loc 1 129 0
+ 516 011e 61E0      		ldi r22,lo8(1)
+ 517 0120 80E0      		ldi r24,0
+ 518 0122 00D0      		rcall ssd1306_setpos
+ 519               	.LVL57:
+ 130:main.c        ****         ssd1306_string_font6x8("U =");
+ 520               		.loc 1 130 0
+ 521 0124 80E0      		ldi r24,lo8(.LC1)
+ 522 0126 90E0      		ldi r25,hi8(.LC1)
+ 523 0128 00D0      		rcall ssd1306_string_font6x8
+ 524               	.LVL58:
+ 131:main.c        ****         ssd1306_char_f8x16(25, 0, voltageString);
+ 525               		.loc 1 131 0
+ 526 012a A301      		movw r20,r6
+ 527 012c 60E0      		ldi r22,0
+ 528 012e 89E1      		ldi r24,lo8(25)
+ 529 0130 00D0      		rcall ssd1306_char_f8x16
+ 530               	.LVL59:
+ 132:main.c        ****         ssd1306_string_font6x8("mV");
+ 531               		.loc 1 132 0
+ 532 0132 80E0      		ldi r24,lo8(.LC2)
+ 533 0134 90E0      		ldi r25,hi8(.LC2)
+ 534 0136 00D0      		rcall ssd1306_string_font6x8
+ 535               	.LVL60:
+ 133:main.c        ****         cleanLine(0, strlen(voltageString));
+ 536               		.loc 1 133 0
+ 537 0138 F301      		movw r30,r6
+ 538               		0:
+ 539 013a 0190      		ld __tmp_reg__,Z+
+ 540 013c 0020      		tst __tmp_reg__
+ 541 013e 01F4      		brne 0b
+ 542 0140 3197      		sbiw r30,1
+ 543 0142 BF01      		movw r22,r30
+ 544 0144 6619      		sub r22,r6
+ 545 0146 7709      		sbc r23,r7
+ 546 0148 80E0      		ldi r24,0
+ 547 014a 00D0      		rcall cleanLine
+ 548               	.LVL61:
+ 134:main.c        **** 
+ 135:main.c        ****         ssd1306_setpos(0, 4);
+ 549               		.loc 1 135 0
+ 550 014c 64E0      		ldi r22,lo8(4)
+ 551 014e 80E0      		ldi r24,0
+ 552 0150 00D0      		rcall ssd1306_setpos
+ 553               	.LVL62:
+ 136:main.c        ****         ssd1306_string_font6x8("I =");
+ 554               		.loc 1 136 0
+ 555 0152 80E0      		ldi r24,lo8(.LC3)
+ 556 0154 90E0      		ldi r25,hi8(.LC3)
+ 557 0156 00D0      		rcall ssd1306_string_font6x8
+ 558               	.LVL63:
+ 137:main.c        ****         ssd1306_char_f8x16(25, 3, currentString);
+ 559               		.loc 1 137 0
+ 560 0158 A101      		movw r20,r2
+ 561 015a 63E0      		ldi r22,lo8(3)
+ 562 015c 89E1      		ldi r24,lo8(25)
+ 563 015e 00D0      		rcall ssd1306_char_f8x16
+ 564               	.LVL64:
+ 138:main.c        ****         ssd1306_string_font6x8("mA");
+ 565               		.loc 1 138 0
+ 566 0160 80E0      		ldi r24,lo8(.LC4)
+ 567 0162 90E0      		ldi r25,hi8(.LC4)
+ 568 0164 00D0      		rcall ssd1306_string_font6x8
+ 569               	.LVL65:
+ 139:main.c        ****         cleanLine(3, strlen(currentString));
+ 570               		.loc 1 139 0
+ 571 0166 F101      		movw r30,r2
+ 572               		0:
+ 573 0168 0190      		ld __tmp_reg__,Z+
+ 574 016a 0020      		tst __tmp_reg__
+ 575 016c 01F4      		brne 0b
+ 576 016e 3197      		sbiw r30,1
+ 577 0170 BF01      		movw r22,r30
+ 578 0172 6219      		sub r22,r2
+ 579 0174 7309      		sbc r23,r3
+ 580 0176 83E0      		ldi r24,lo8(3)
+ 581 0178 00D0      		rcall cleanLine
+ 582               	.LVL66:
+ 140:main.c        **** 
+ 141:main.c        ****         //draw the multiplier indicator at the top right
+ 142:main.c        ****         if (currentMode == I_GAIN) {
+ 583               		.loc 1 142 0
+ 584 017a 8091 0000 		lds r24,currentMode
+ 585 017e 8111      		cpse r24,__zero_reg__
+ 586 0180 00C0      		rjmp .L23
+ 143:main.c        ****             ssd1306_setpos(64, 4);
+ 587               		.loc 1 143 0
+ 588 0182 64E0      		ldi r22,lo8(4)
+ 589 0184 80E4      		ldi r24,lo8(64)
+ 590 0186 00D0      		rcall ssd1306_setpos
+ 591               	.LVL67:
+ 144:main.c        ****             ssd1306_string_font6x8(" (x20)");
+ 592               		.loc 1 144 0
+ 593 0188 80E0      		ldi r24,lo8(.LC5)
+ 594 018a 90E0      		ldi r25,hi8(.LC5)
+ 595 018c 00D0      		rcall ssd1306_string_font6x8
+ 596               	.LVL68:
+ 597               	.L23:
+ 145:main.c        ****         }
+ 146:main.c        ****         
+ 147:main.c        **** 
+ 148:main.c        ****         ssd1306_setpos(0, 7);
+ 598               		.loc 1 148 0
+ 599 018e 67E0      		ldi r22,lo8(7)
+ 600 0190 80E0      		ldi r24,0
+ 601 0192 00D0      		rcall ssd1306_setpos
+ 602               	.LVL69:
+ 149:main.c        ****         ssd1306_string_font6x8("P =");
+ 603               		.loc 1 149 0
+ 604 0194 80E0      		ldi r24,lo8(.LC6)
+ 605 0196 90E0      		ldi r25,hi8(.LC6)
+ 606 0198 00D0      		rcall ssd1306_string_font6x8
+ 607               	.LVL70:
+ 150:main.c        ****         ssd1306_char_f8x16(25, 6, powerString);
+ 608               		.loc 1 150 0
+ 609 019a A801      		movw r20,r16
+ 610 019c 66E0      		ldi r22,lo8(6)
+ 611 019e 89E1      		ldi r24,lo8(25)
+ 612 01a0 00D0      		rcall ssd1306_char_f8x16
+ 613               	.LVL71:
+ 151:main.c        ****         ssd1306_string_font6x8("mW");
+ 614               		.loc 1 151 0
+ 615 01a2 80E0      		ldi r24,lo8(.LC7)
+ 616 01a4 90E0      		ldi r25,hi8(.LC7)
+ 617 01a6 00D0      		rcall ssd1306_string_font6x8
+ 618               	.LVL72:
+ 152:main.c        **** 
+ 153:main.c        ****         cleanLine(6, strlen(powerString));
+ 619               		.loc 1 153 0
+ 620 01a8 F801      		movw r30,r16
+ 621               		0:
+ 622 01aa 0190      		ld __tmp_reg__,Z+
+ 623 01ac 0020      		tst __tmp_reg__
+ 624 01ae 01F4      		brne 0b
+ 625 01b0 3197      		sbiw r30,1
+ 626 01b2 BF01      		movw r22,r30
+ 627 01b4 601B      		sub r22,r16
+ 628 01b6 710B      		sbc r23,r17
+ 629 01b8 86E0      		ldi r24,lo8(6)
+ 630 01ba 00D0      		rcall cleanLine
+ 631               	.LVL73:
+ 632 01bc 00C0      		rjmp .L16
+ 633               	.L19:
+ 111:main.c        ****             //reset the debounce state as soon as we measure 
+ 634               		.loc 1 111 0
+ 635 01be 20E0      		ldi r18,0
+ 636 01c0 30E0      		ldi r19,0
+ 637 01c2 4AEF      		ldi r20,lo8(-6)
+ 638 01c4 54E4      		ldi r21,lo8(68)
+ 639 01c6 C701      		movw r24,r14
+ 640 01c8 B601      		movw r22,r12
+ 641 01ca 00D0      		rcall __gtsf2
+ 642               	.LVL74:
+ 643 01cc 1816      		cp __zero_reg__,r24
+ 644 01ce 04F4      		brge .+2
+ 645 01d0 00C0      		rjmp .L24
+ 646 01d2 00C0      		rjmp .L21
+ 647               	.LBE11:
+ 648               		.cfi_endproc
+ 649               	.LFE10:
+ 651               		.local	buttonPressed.1872
+ 652               		.comm	buttonPressed.1872,2,1
+ 653               	.global	currentMode
+ 654               		.section .bss
+ 657               	currentMode:
+ 658 0000 00        		.zero	1
+ 659               	.global	logo
+ 660               		.section	.progmem.data,"a",@progbits
+ 663               	logo:
+ 664 0000 00        		.byte	0
+ 665 0001 00        		.byte	0
+ 666 0002 00        		.byte	0
+ 667 0003 00        		.byte	0
+ 668 0004 00        		.byte	0
+ 669 0005 00        		.byte	0
+ 670 0006 00        		.byte	0
+ 671 0007 00        		.byte	0
+ 672 0008 00        		.byte	0
+ 673 0009 00        		.byte	0
+ 674 000a 00        		.byte	0
+ 675 000b 00        		.byte	0
+ 676 000c 00        		.byte	0
+ 677 000d 00        		.byte	0
+ 678 000e 00        		.byte	0
+ 679 000f 00        		.byte	0
+ 680 0010 00        		.byte	0
+ 681 0011 00        		.byte	0
+ 682 0012 00        		.byte	0
+ 683 0013 00        		.byte	0
+ 684 0014 80        		.byte	-128
+ 685 0015 80        		.byte	-128
+ 686 0016 80        		.byte	-128
+ 687 0017 80        		.byte	-128
+ 688 0018 80        		.byte	-128
+ 689 0019 C0        		.byte	-64
+ 690 001a C0        		.byte	-64
+ 691 001b C0        		.byte	-64
+ 692 001c C0        		.byte	-64
+ 693 001d C0        		.byte	-64
+ 694 001e C0        		.byte	-64
+ 695 001f C0        		.byte	-64
+ 696 0020 C0        		.byte	-64
+ 697 0021 80        		.byte	-128
+ 698 0022 80        		.byte	-128
+ 699 0023 80        		.byte	-128
+ 700 0024 80        		.byte	-128
+ 701 0025 00        		.byte	0
+ 702 0026 00        		.byte	0
+ 703 0027 00        		.byte	0
+ 704 0028 00        		.byte	0
+ 705 0029 00        		.byte	0
+ 706 002a 80        		.byte	-128
+ 707 002b 80        		.byte	-128
+ 708 002c 80        		.byte	-128
+ 709 002d 80        		.byte	-128
+ 710 002e C0        		.byte	-64
+ 711 002f C0        		.byte	-64
+ 712 0030 C0        		.byte	-64
+ 713 0031 C0        		.byte	-64
+ 714 0032 C0        		.byte	-64
+ 715 0033 C0        		.byte	-64
+ 716 0034 C0        		.byte	-64
+ 717 0035 C0        		.byte	-64
+ 718 0036 C0        		.byte	-64
+ 719 0037 C0        		.byte	-64
+ 720 0038 80        		.byte	-128
+ 721 0039 80        		.byte	-128
+ 722 003a 80        		.byte	-128
+ 723 003b 80        		.byte	-128
+ 724 003c 00        		.byte	0
+ 725 003d 00        		.byte	0
+ 726 003e 00        		.byte	0
+ 727 003f 00        		.byte	0
+ 728 0040 00        		.byte	0
+ 729 0041 00        		.byte	0
+ 730 0042 00        		.byte	0
+ 731 0043 00        		.byte	0
+ 732 0044 00        		.byte	0
+ 733 0045 00        		.byte	0
+ 734 0046 00        		.byte	0
+ 735 0047 00        		.byte	0
+ 736 0048 00        		.byte	0
+ 737 0049 80        		.byte	-128
+ 738 004a 80        		.byte	-128
+ 739 004b 80        		.byte	-128
+ 740 004c C0        		.byte	-64
+ 741 004d C0        		.byte	-64
+ 742 004e C0        		.byte	-64
+ 743 004f C0        		.byte	-64
+ 744 0050 C0        		.byte	-64
+ 745 0051 C0        		.byte	-64
+ 746 0052 E0        		.byte	-32
+ 747 0053 E0        		.byte	-32
+ 748 0054 E0        		.byte	-32
+ 749 0055 C0        		.byte	-64
+ 750 0056 C0        		.byte	-64
+ 751 0057 C0        		.byte	-64
+ 752 0058 C0        		.byte	-64
+ 753 0059 C0        		.byte	-64
+ 754 005a C0        		.byte	-64
+ 755 005b 80        		.byte	-128
+ 756 005c 80        		.byte	-128
+ 757 005d 80        		.byte	-128
+ 758 005e 00        		.byte	0
+ 759 005f 00        		.byte	0
+ 760 0060 00        		.byte	0
+ 761 0061 00        		.byte	0
+ 762 0062 00        		.byte	0
+ 763 0063 00        		.byte	0
+ 764 0064 00        		.byte	0
+ 765 0065 00        		.byte	0
+ 766 0066 00        		.byte	0
+ 767 0067 00        		.byte	0
+ 768 0068 00        		.byte	0
+ 769 0069 00        		.byte	0
+ 770 006a 00        		.byte	0
+ 771 006b 00        		.byte	0
+ 772 006c 00        		.byte	0
+ 773 006d 00        		.byte	0
+ 774 006e 00        		.byte	0
+ 775 006f 00        		.byte	0
+ 776 0070 00        		.byte	0
+ 777 0071 00        		.byte	0
+ 778 0072 00        		.byte	0
+ 779 0073 00        		.byte	0
+ 780 0074 00        		.byte	0
+ 781 0075 00        		.byte	0
+ 782 0076 00        		.byte	0
+ 783 0077 00        		.byte	0
+ 784 0078 00        		.byte	0
+ 785 0079 00        		.byte	0
+ 786 007a 00        		.byte	0
+ 787 007b 00        		.byte	0
+ 788 007c 00        		.byte	0
+ 789 007d 00        		.byte	0
+ 790 007e 00        		.byte	0
+ 791 007f 00        		.byte	0
+ 792 0080 00        		.byte	0
+ 793 0081 00        		.byte	0
+ 794 0082 00        		.byte	0
+ 795 0083 00        		.byte	0
+ 796 0084 00        		.byte	0
+ 797 0085 00        		.byte	0
+ 798 0086 00        		.byte	0
+ 799 0087 00        		.byte	0
+ 800 0088 00        		.byte	0
+ 801 0089 00        		.byte	0
+ 802 008a 00        		.byte	0
+ 803 008b 00        		.byte	0
+ 804 008c 00        		.byte	0
+ 805 008d 00        		.byte	0
+ 806 008e 01        		.byte	1
+ 807 008f 01        		.byte	1
+ 808 0090 81        		.byte	-127
+ 809 0091 81        		.byte	-127
+ 810 0092 81        		.byte	-127
+ 811 0093 81        		.byte	-127
+ 812 0094 01        		.byte	1
+ 813 0095 01        		.byte	1
+ 814 0096 01        		.byte	1
+ 815 0097 01        		.byte	1
+ 816 0098 01        		.byte	1
+ 817 0099 03        		.byte	3
+ 818 009a 03        		.byte	3
+ 819 009b 07        		.byte	7
+ 820 009c 07        		.byte	7
+ 821 009d 0F        		.byte	15
+ 822 009e 0F        		.byte	15
+ 823 009f 1F        		.byte	31
+ 824 00a0 3F        		.byte	63
+ 825 00a1 FF        		.byte	-1
+ 826 00a2 FF        		.byte	-1
+ 827 00a3 FF        		.byte	-1
+ 828 00a4 FF        		.byte	-1
+ 829 00a5 FF        		.byte	-1
+ 830 00a6 FF        		.byte	-1
+ 831 00a7 FF        		.byte	-1
+ 832 00a8 FF        		.byte	-1
+ 833 00a9 FF        		.byte	-1
+ 834 00aa FF        		.byte	-1
+ 835 00ab FF        		.byte	-1
+ 836 00ac FF        		.byte	-1
+ 837 00ad FF        		.byte	-1
+ 838 00ae FF        		.byte	-1
+ 839 00af FF        		.byte	-1
+ 840 00b0 FF        		.byte	-1
+ 841 00b1 FF        		.byte	-1
+ 842 00b2 FF        		.byte	-1
+ 843 00b3 FF        		.byte	-1
+ 844 00b4 FF        		.byte	-1
+ 845 00b5 FF        		.byte	-1
+ 846 00b6 FF        		.byte	-1
+ 847 00b7 FF        		.byte	-1
+ 848 00b8 FF        		.byte	-1
+ 849 00b9 FF        		.byte	-1
+ 850 00ba FF        		.byte	-1
+ 851 00bb FF        		.byte	-1
+ 852 00bc FE        		.byte	-2
+ 853 00bd FE        		.byte	-2
+ 854 00be FE        		.byte	-2
+ 855 00bf FC        		.byte	-4
+ 856 00c0 FC        		.byte	-4
+ 857 00c1 FC        		.byte	-4
+ 858 00c2 FE        		.byte	-2
+ 859 00c3 FF        		.byte	-1
+ 860 00c4 FF        		.byte	-1
+ 861 00c5 FF        		.byte	-1
+ 862 00c6 FF        		.byte	-1
+ 863 00c7 FF        		.byte	-1
+ 864 00c8 FF        		.byte	-1
+ 865 00c9 3F        		.byte	63
+ 866 00ca 1F        		.byte	31
+ 867 00cb 0F        		.byte	15
+ 868 00cc 0F        		.byte	15
+ 869 00cd 07        		.byte	7
+ 870 00ce 03        		.byte	3
+ 871 00cf 03        		.byte	3
+ 872 00d0 01        		.byte	1
+ 873 00d1 01        		.byte	1
+ 874 00d2 01        		.byte	1
+ 875 00d3 00        		.byte	0
+ 876 00d4 00        		.byte	0
+ 877 00d5 00        		.byte	0
+ 878 00d6 00        		.byte	0
+ 879 00d7 00        		.byte	0
+ 880 00d8 00        		.byte	0
+ 881 00d9 00        		.byte	0
+ 882 00da 00        		.byte	0
+ 883 00db 01        		.byte	1
+ 884 00dc 01        		.byte	1
+ 885 00dd 02        		.byte	2
+ 886 00de 00        		.byte	0
+ 887 00df 00        		.byte	0
+ 888 00e0 00        		.byte	0
+ 889 00e1 00        		.byte	0
+ 890 00e2 00        		.byte	0
+ 891 00e3 00        		.byte	0
+ 892 00e4 00        		.byte	0
+ 893 00e5 80        		.byte	-128
+ 894 00e6 00        		.byte	0
+ 895 00e7 00        		.byte	0
+ 896 00e8 00        		.byte	0
+ 897 00e9 00        		.byte	0
+ 898 00ea 00        		.byte	0
+ 899 00eb 00        		.byte	0
+ 900 00ec 00        		.byte	0
+ 901 00ed 00        		.byte	0
+ 902 00ee 00        		.byte	0
+ 903 00ef 00        		.byte	0
+ 904 00f0 00        		.byte	0
+ 905 00f1 00        		.byte	0
+ 906 00f2 00        		.byte	0
+ 907 00f3 00        		.byte	0
+ 908 00f4 00        		.byte	0
+ 909 00f5 00        		.byte	0
+ 910 00f6 00        		.byte	0
+ 911 00f7 00        		.byte	0
+ 912 00f8 00        		.byte	0
+ 913 00f9 00        		.byte	0
+ 914 00fa 00        		.byte	0
+ 915 00fb 00        		.byte	0
+ 916 00fc 00        		.byte	0
+ 917 00fd 00        		.byte	0
+ 918 00fe 00        		.byte	0
+ 919 00ff 00        		.byte	0
+ 920 0100 00        		.byte	0
+ 921 0101 00        		.byte	0
+ 922 0102 00        		.byte	0
+ 923 0103 00        		.byte	0
+ 924 0104 00        		.byte	0
+ 925 0105 F8        		.byte	-8
+ 926 0106 FC        		.byte	-4
+ 927 0107 FE        		.byte	-2
+ 928 0108 FE        		.byte	-2
+ 929 0109 FF        		.byte	-1
+ 930 010a FF        		.byte	-1
+ 931 010b FF        		.byte	-1
+ 932 010c FF        		.byte	-1
+ 933 010d FF        		.byte	-1
+ 934 010e FF        		.byte	-1
+ 935 010f FF        		.byte	-1
+ 936 0110 FF        		.byte	-1
+ 937 0111 FF        		.byte	-1
+ 938 0112 FF        		.byte	-1
+ 939 0113 FF        		.byte	-1
+ 940 0114 FF        		.byte	-1
+ 941 0115 FE        		.byte	-2
+ 942 0116 FC        		.byte	-4
+ 943 0117 F8        		.byte	-8
+ 944 0118 F0        		.byte	-16
+ 945 0119 00        		.byte	0
+ 946 011a 00        		.byte	0
+ 947 011b 00        		.byte	0
+ 948 011c 00        		.byte	0
+ 949 011d 00        		.byte	0
+ 950 011e 00        		.byte	0
+ 951 011f 1F        		.byte	31
+ 952 0120 FF        		.byte	-1
+ 953 0121 FF        		.byte	-1
+ 954 0122 FF        		.byte	-1
+ 955 0123 FF        		.byte	-1
+ 956 0124 FF        		.byte	-1
+ 957 0125 FF        		.byte	-1
+ 958 0126 FF        		.byte	-1
+ 959 0127 3F        		.byte	63
+ 960 0128 1F        		.byte	31
+ 961 0129 3F        		.byte	63
+ 962 012a 3F        		.byte	63
+ 963 012b 3F        		.byte	63
+ 964 012c 7F        		.byte	127
+ 965 012d FF        		.byte	-1
+ 966 012e FF        		.byte	-1
+ 967 012f FF        		.byte	-1
+ 968 0130 FF        		.byte	-1
+ 969 0131 FF        		.byte	-1
+ 970 0132 FF        		.byte	-1
+ 971 0133 FF        		.byte	-1
+ 972 0134 FF        		.byte	-1
+ 973 0135 FF        		.byte	-1
+ 974 0136 FF        		.byte	-1
+ 975 0137 FF        		.byte	-1
+ 976 0138 FF        		.byte	-1
+ 977 0139 FF        		.byte	-1
+ 978 013a FF        		.byte	-1
+ 979 013b FF        		.byte	-1
+ 980 013c FF        		.byte	-1
+ 981 013d FF        		.byte	-1
+ 982 013e FF        		.byte	-1
+ 983 013f FF        		.byte	-1
+ 984 0140 FF        		.byte	-1
+ 985 0141 FF        		.byte	-1
+ 986 0142 FF        		.byte	-1
+ 987 0143 07        		.byte	7
+ 988 0144 03        		.byte	3
+ 989 0145 00        		.byte	0
+ 990 0146 00        		.byte	0
+ 991 0147 00        		.byte	0
+ 992 0148 00        		.byte	0
+ 993 0149 00        		.byte	0
+ 994 014a F0        		.byte	-16
+ 995 014b F8        		.byte	-8
+ 996 014c FC        		.byte	-4
+ 997 014d FE        		.byte	-2
+ 998 014e FF        		.byte	-1
+ 999 014f FF        		.byte	-1
+ 1000 0150 FF        		.byte	-1
+ 1001 0151 FF        		.byte	-1
+ 1002 0152 FF        		.byte	-1
+ 1003 0153 FF        		.byte	-1
+ 1004 0154 FF        		.byte	-1
+ 1005 0155 FF        		.byte	-1
+ 1006 0156 FF        		.byte	-1
+ 1007 0157 FF        		.byte	-1
+ 1008 0158 FF        		.byte	-1
+ 1009 0159 FF        		.byte	-1
+ 1010 015a FE        		.byte	-2
+ 1011 015b FC        		.byte	-4
+ 1012 015c F8        		.byte	-8
+ 1013 015d E0        		.byte	-32
+ 1014 015e 00        		.byte	0
+ 1015 015f 00        		.byte	0
+ 1016 0160 00        		.byte	0
+ 1017 0161 00        		.byte	0
+ 1018 0162 00        		.byte	0
+ 1019 0163 01        		.byte	1
+ 1020 0164 07        		.byte	7
+ 1021 0165 1E        		.byte	30
+ 1022 0166 1E        		.byte	30
+ 1023 0167 3C        		.byte	60
+ 1024 0168 3C        		.byte	60
+ 1025 0169 38        		.byte	56
+ 1026 016a 70        		.byte	112
+ 1027 016b F0        		.byte	-16
+ 1028 016c E0        		.byte	-32
+ 1029 016d C0        		.byte	-64
+ 1030 016e 00        		.byte	0
+ 1031 016f 00        		.byte	0
+ 1032 0170 00        		.byte	0
+ 1033 0171 00        		.byte	0
+ 1034 0172 00        		.byte	0
+ 1035 0173 00        		.byte	0
+ 1036 0174 00        		.byte	0
+ 1037 0175 00        		.byte	0
+ 1038 0176 00        		.byte	0
+ 1039 0177 00        		.byte	0
+ 1040 0178 00        		.byte	0
+ 1041 0179 00        		.byte	0
+ 1042 017a 00        		.byte	0
+ 1043 017b 00        		.byte	0
+ 1044 017c 00        		.byte	0
+ 1045 017d 00        		.byte	0
+ 1046 017e 00        		.byte	0
+ 1047 017f 00        		.byte	0
+ 1048 0180 00        		.byte	0
+ 1049 0181 00        		.byte	0
+ 1050 0182 FF        		.byte	-1
+ 1051 0183 FF        		.byte	-1
+ 1052 0184 FF        		.byte	-1
+ 1053 0185 FF        		.byte	-1
+ 1054 0186 FF        		.byte	-1
+ 1055 0187 FF        		.byte	-1
+ 1056 0188 FF        		.byte	-1
+ 1057 0189 FF        		.byte	-1
+ 1058 018a FF        		.byte	-1
+ 1059 018b FF        		.byte	-1
+ 1060 018c FF        		.byte	-1
+ 1061 018d FF        		.byte	-1
+ 1062 018e FF        		.byte	-1
+ 1063 018f FF        		.byte	-1
+ 1064 0190 FF        		.byte	-1
+ 1065 0191 FF        		.byte	-1
+ 1066 0192 FF        		.byte	-1
+ 1067 0193 FF        		.byte	-1
+ 1068 0194 FF        		.byte	-1
+ 1069 0195 FF        		.byte	-1
+ 1070 0196 00        		.byte	0
+ 1071 0197 00        		.byte	0
+ 1072 0198 00        		.byte	0
+ 1073 0199 00        		.byte	0
+ 1074 019a 00        		.byte	0
+ 1075 019b 00        		.byte	0
+ 1076 019c 00        		.byte	0
+ 1077 019d FF        		.byte	-1
+ 1078 019e FF        		.byte	-1
+ 1079 019f FF        		.byte	-1
+ 1080 01a0 FF        		.byte	-1
+ 1081 01a1 FF        		.byte	-1
+ 1082 01a2 FF        		.byte	-1
+ 1083 01a3 FF        		.byte	-1
+ 1084 01a4 00        		.byte	0
+ 1085 01a5 00        		.byte	0
+ 1086 01a6 00        		.byte	0
+ 1087 01a7 00        		.byte	0
+ 1088 01a8 00        		.byte	0
+ 1089 01a9 00        		.byte	0
+ 1090 01aa 00        		.byte	0
+ 1091 01ab FF        		.byte	-1
+ 1092 01ac FF        		.byte	-1
+ 1093 01ad FF        		.byte	-1
+ 1094 01ae FF        		.byte	-1
+ 1095 01af FF        		.byte	-1
+ 1096 01b0 FF        		.byte	-1
+ 1097 01b1 FF        		.byte	-1
+ 1098 01b2 FF        		.byte	-1
+ 1099 01b3 FF        		.byte	-1
+ 1100 01b4 FF        		.byte	-1
+ 1101 01b5 FF        		.byte	-1
+ 1102 01b6 FF        		.byte	-1
+ 1103 01b7 FF        		.byte	-1
+ 1104 01b8 FF        		.byte	-1
+ 1105 01b9 FF        		.byte	-1
+ 1106 01ba FF        		.byte	-1
+ 1107 01bb FF        		.byte	-1
+ 1108 01bc FF        		.byte	-1
+ 1109 01bd FF        		.byte	-1
+ 1110 01be FF        		.byte	-1
+ 1111 01bf FF        		.byte	-1
+ 1112 01c0 00        		.byte	0
+ 1113 01c1 00        		.byte	0
+ 1114 01c2 00        		.byte	0
+ 1115 01c3 00        		.byte	0
+ 1116 01c4 00        		.byte	0
+ 1117 01c5 00        		.byte	0
+ 1118 01c6 00        		.byte	0
+ 1119 01c7 FF        		.byte	-1
+ 1120 01c8 FF        		.byte	-1
+ 1121 01c9 FF        		.byte	-1
+ 1122 01ca FF        		.byte	-1
+ 1123 01cb FF        		.byte	-1
+ 1124 01cc FF        		.byte	-1
+ 1125 01cd FF        		.byte	-1
+ 1126 01ce FF        		.byte	-1
+ 1127 01cf FF        		.byte	-1
+ 1128 01d0 FF        		.byte	-1
+ 1129 01d1 FF        		.byte	-1
+ 1130 01d2 FF        		.byte	-1
+ 1131 01d3 FF        		.byte	-1
+ 1132 01d4 FF        		.byte	-1
+ 1133 01d5 FF        		.byte	-1
+ 1134 01d6 FF        		.byte	-1
+ 1135 01d7 FF        		.byte	-1
+ 1136 01d8 7F        		.byte	127
+ 1137 01d9 3F        		.byte	63
+ 1138 01da 0F        		.byte	15
+ 1139 01db 00        		.byte	0
+ 1140 01dc 00        		.byte	0
+ 1141 01dd 00        		.byte	0
+ 1142 01de 00        		.byte	0
+ 1143 01df 00        		.byte	0
+ 1144 01e0 00        		.byte	0
+ 1145 01e1 C0        		.byte	-64
+ 1146 01e2 E0        		.byte	-32
+ 1147 01e3 E0        		.byte	-32
+ 1148 01e4 E0        		.byte	-32
+ 1149 01e5 C0        		.byte	-64
+ 1150 01e6 C0        		.byte	-64
+ 1151 01e7 80        		.byte	-128
+ 1152 01e8 00        		.byte	0
+ 1153 01e9 00        		.byte	0
+ 1154 01ea 01        		.byte	1
+ 1155 01eb 03        		.byte	3
+ 1156 01ec 06        		.byte	6
+ 1157 01ed 18        		.byte	24
+ 1158 01ee 20        		.byte	32
+ 1159 01ef 00        		.byte	0
+ 1160 01f0 00        		.byte	0
+ 1161 01f1 00        		.byte	0
+ 1162 01f2 00        		.byte	0
+ 1163 01f3 00        		.byte	0
+ 1164 01f4 00        		.byte	0
+ 1165 01f5 00        		.byte	0
+ 1166 01f6 00        		.byte	0
+ 1167 01f7 00        		.byte	0
+ 1168 01f8 00        		.byte	0
+ 1169 01f9 00        		.byte	0
+ 1170 01fa 00        		.byte	0
+ 1171 01fb 00        		.byte	0
+ 1172 01fc 00        		.byte	0
+ 1173 01fd 00        		.byte	0
+ 1174 01fe 00        		.byte	0
+ 1175 01ff FF        		.byte	-1
+ 1176 0200 FF        		.byte	-1
+ 1177 0201 FF        		.byte	-1
+ 1178 0202 FF        		.byte	-1
+ 1179 0203 FF        		.byte	-1
+ 1180 0204 FF        		.byte	-1
+ 1181 0205 FF        		.byte	-1
+ 1182 0206 FF        		.byte	-1
+ 1183 0207 FF        		.byte	-1
+ 1184 0208 FF        		.byte	-1
+ 1185 0209 FF        		.byte	-1
+ 1186 020a FF        		.byte	-1
+ 1187 020b FF        		.byte	-1
+ 1188 020c FF        		.byte	-1
+ 1189 020d FF        		.byte	-1
+ 1190 020e FF        		.byte	-1
+ 1191 020f FF        		.byte	-1
+ 1192 0210 FF        		.byte	-1
+ 1193 0211 FF        		.byte	-1
+ 1194 0212 FF        		.byte	-1
+ 1195 0213 00        		.byte	0
+ 1196 0214 00        		.byte	0
+ 1197 0215 00        		.byte	0
+ 1198 0216 00        		.byte	0
+ 1199 0217 00        		.byte	0
+ 1200 0218 00        		.byte	0
+ 1201 0219 00        		.byte	0
+ 1202 021a FF        		.byte	-1
+ 1203 021b FF        		.byte	-1
+ 1204 021c FF        		.byte	-1
+ 1205 021d FF        		.byte	-1
+ 1206 021e FF        		.byte	-1
+ 1207 021f FF        		.byte	-1
+ 1208 0220 FF        		.byte	-1
+ 1209 0221 00        		.byte	0
+ 1210 0222 00        		.byte	0
+ 1211 0223 00        		.byte	0
+ 1212 0224 00        		.byte	0
+ 1213 0225 00        		.byte	0
+ 1214 0226 00        		.byte	0
+ 1215 0227 00        		.byte	0
+ 1216 0228 FF        		.byte	-1
+ 1217 0229 FF        		.byte	-1
+ 1218 022a FF        		.byte	-1
+ 1219 022b FF        		.byte	-1
+ 1220 022c FF        		.byte	-1
+ 1221 022d FF        		.byte	-1
+ 1222 022e FF        		.byte	-1
+ 1223 022f FF        		.byte	-1
+ 1224 0230 FF        		.byte	-1
+ 1225 0231 FF        		.byte	-1
+ 1226 0232 FF        		.byte	-1
+ 1227 0233 FF        		.byte	-1
+ 1228 0234 FF        		.byte	-1
+ 1229 0235 FF        		.byte	-1
+ 1230 0236 FF        		.byte	-1
+ 1231 0237 FF        		.byte	-1
+ 1232 0238 FF        		.byte	-1
+ 1233 0239 FF        		.byte	-1
+ 1234 023a FF        		.byte	-1
+ 1235 023b FF        		.byte	-1
+ 1236 023c FF        		.byte	-1
+ 1237 023d 00        		.byte	0
+ 1238 023e 00        		.byte	0
+ 1239 023f 00        		.byte	0
+ 1240 0240 00        		.byte	0
+ 1241 0241 00        		.byte	0
+ 1242 0242 00        		.byte	0
+ 1243 0243 00        		.byte	0
+ 1244 0244 03        		.byte	3
+ 1245 0245 03        		.byte	3
+ 1246 0246 03        		.byte	3
+ 1247 0247 03        		.byte	3
+ 1248 0248 03        		.byte	3
+ 1249 0249 03        		.byte	3
+ 1250 024a 03        		.byte	3
+ 1251 024b 03        		.byte	3
+ 1252 024c 03        		.byte	3
+ 1253 024d 03        		.byte	3
+ 1254 024e 03        		.byte	3
+ 1255 024f 03        		.byte	3
+ 1256 0250 03        		.byte	3
+ 1257 0251 03        		.byte	3
+ 1258 0252 01        		.byte	1
+ 1259 0253 01        		.byte	1
+ 1260 0254 00        		.byte	0
+ 1261 0255 00        		.byte	0
+ 1262 0256 00        		.byte	0
+ 1263 0257 00        		.byte	0
+ 1264 0258 80        		.byte	-128
+ 1265 0259 C0        		.byte	-64
+ 1266 025a E0        		.byte	-32
+ 1267 025b F0        		.byte	-16
+ 1268 025c FC        		.byte	-4
+ 1269 025d FE        		.byte	-2
+ 1270 025e FF        		.byte	-1
+ 1271 025f FF        		.byte	-1
+ 1272 0260 FF        		.byte	-1
+ 1273 0261 FF        		.byte	-1
+ 1274 0262 FF        		.byte	-1
+ 1275 0263 FF        		.byte	-1
+ 1276 0264 FF        		.byte	-1
+ 1277 0265 FE        		.byte	-2
+ 1278 0266 FC        		.byte	-4
+ 1279 0267 E0        		.byte	-32
+ 1280 0268 00        		.byte	0
+ 1281 0269 00        		.byte	0
+ 1282 026a 00        		.byte	0
+ 1283 026b 00        		.byte	0
+ 1284 026c 00        		.byte	0
+ 1285 026d 00        		.byte	0
+ 1286 026e 00        		.byte	0
+ 1287 026f 00        		.byte	0
+ 1288 0270 00        		.byte	0
+ 1289 0271 00        		.byte	0
+ 1290 0272 00        		.byte	0
+ 1291 0273 00        		.byte	0
+ 1292 0274 00        		.byte	0
+ 1293 0275 00        		.byte	0
+ 1294 0276 00        		.byte	0
+ 1295 0277 00        		.byte	0
+ 1296 0278 00        		.byte	0
+ 1297 0279 00        		.byte	0
+ 1298 027a 00        		.byte	0
+ 1299 027b 00        		.byte	0
+ 1300 027c FF        		.byte	-1
+ 1301 027d FF        		.byte	-1
+ 1302 027e FF        		.byte	-1
+ 1303 027f FF        		.byte	-1
+ 1304 0280 FF        		.byte	-1
+ 1305 0281 FF        		.byte	-1
+ 1306 0282 FF        		.byte	-1
+ 1307 0283 FF        		.byte	-1
+ 1308 0284 FF        		.byte	-1
+ 1309 0285 FF        		.byte	-1
+ 1310 0286 FF        		.byte	-1
+ 1311 0287 FF        		.byte	-1
+ 1312 0288 FF        		.byte	-1
+ 1313 0289 FF        		.byte	-1
+ 1314 028a FF        		.byte	-1
+ 1315 028b FF        		.byte	-1
+ 1316 028c FF        		.byte	-1
+ 1317 028d FF        		.byte	-1
+ 1318 028e FF        		.byte	-1
+ 1319 028f FF        		.byte	-1
+ 1320 0290 00        		.byte	0
+ 1321 0291 00        		.byte	0
+ 1322 0292 00        		.byte	0
+ 1323 0293 00        		.byte	0
+ 1324 0294 00        		.byte	0
+ 1325 0295 00        		.byte	0
+ 1326 0296 00        		.byte	0
+ 1327 0297 FF        		.byte	-1
+ 1328 0298 FF        		.byte	-1
+ 1329 0299 FF        		.byte	-1
+ 1330 029a FF        		.byte	-1
+ 1331 029b FF        		.byte	-1
+ 1332 029c FF        		.byte	-1
+ 1333 029d FF        		.byte	-1
+ 1334 029e FE        		.byte	-2
+ 1335 029f F0        		.byte	-16
+ 1336 02a0 80        		.byte	-128
+ 1337 02a1 00        		.byte	0
+ 1338 02a2 00        		.byte	0
+ 1339 02a3 00        		.byte	0
+ 1340 02a4 00        		.byte	0
+ 1341 02a5 01        		.byte	1
+ 1342 02a6 0F        		.byte	15
+ 1343 02a7 1F        		.byte	31
+ 1344 02a8 3F        		.byte	63
+ 1345 02a9 7F        		.byte	127
+ 1346 02aa FF        		.byte	-1
+ 1347 02ab FF        		.byte	-1
+ 1348 02ac FF        		.byte	-1
+ 1349 02ad FF        		.byte	-1
+ 1350 02ae FF        		.byte	-1
+ 1351 02af FF        		.byte	-1
+ 1352 02b0 FF        		.byte	-1
+ 1353 02b1 FF        		.byte	-1
+ 1354 02b2 FF        		.byte	-1
+ 1355 02b3 FF        		.byte	-1
+ 1356 02b4 FF        		.byte	-1
+ 1357 02b5 7F        		.byte	127
+ 1358 02b6 3F        		.byte	63
+ 1359 02b7 1F        		.byte	31
+ 1360 02b8 0F        		.byte	15
+ 1361 02b9 01        		.byte	1
+ 1362 02ba 00        		.byte	0
+ 1363 02bb 00        		.byte	0
+ 1364 02bc 00        		.byte	0
+ 1365 02bd 00        		.byte	0
+ 1366 02be 80        		.byte	-128
+ 1367 02bf E0        		.byte	-32
+ 1368 02c0 F8        		.byte	-8
+ 1369 02c1 F8        		.byte	-8
+ 1370 02c2 F8        		.byte	-8
+ 1371 02c3 F8        		.byte	-8
+ 1372 02c4 F8        		.byte	-8
+ 1373 02c5 F8        		.byte	-8
+ 1374 02c6 F8        		.byte	-8
+ 1375 02c7 F8        		.byte	-8
+ 1376 02c8 F0        		.byte	-16
+ 1377 02c9 80        		.byte	-128
+ 1378 02ca 00        		.byte	0
+ 1379 02cb 00        		.byte	0
+ 1380 02cc 00        		.byte	0
+ 1381 02cd 00        		.byte	0
+ 1382 02ce 00        		.byte	0
+ 1383 02cf 04        		.byte	4
+ 1384 02d0 0C        		.byte	12
+ 1385 02d1 3E        		.byte	62
+ 1386 02d2 7E        		.byte	126
+ 1387 02d3 FF        		.byte	-1
+ 1388 02d4 FF        		.byte	-1
+ 1389 02d5 FF        		.byte	-1
+ 1390 02d6 FF        		.byte	-1
+ 1391 02d7 FF        		.byte	-1
+ 1392 02d8 FF        		.byte	-1
+ 1393 02d9 FF        		.byte	-1
+ 1394 02da FF        		.byte	-1
+ 1395 02db FF        		.byte	-1
+ 1396 02dc FF        		.byte	-1
+ 1397 02dd FF        		.byte	-1
+ 1398 02de FF        		.byte	-1
+ 1399 02df FF        		.byte	-1
+ 1400 02e0 7F        		.byte	127
+ 1401 02e1 7F        		.byte	127
+ 1402 02e2 1F        		.byte	31
+ 1403 02e3 0F        		.byte	15
+ 1404 02e4 01        		.byte	1
+ 1405 02e5 00        		.byte	0
+ 1406 02e6 00        		.byte	0
+ 1407 02e7 00        		.byte	0
+ 1408 02e8 00        		.byte	0
+ 1409 02e9 00        		.byte	0
+ 1410 02ea 00        		.byte	0
+ 1411 02eb 00        		.byte	0
+ 1412 02ec 00        		.byte	0
+ 1413 02ed 00        		.byte	0
+ 1414 02ee 00        		.byte	0
+ 1415 02ef 00        		.byte	0
+ 1416 02f0 00        		.byte	0
+ 1417 02f1 00        		.byte	0
+ 1418 02f2 00        		.byte	0
+ 1419 02f3 00        		.byte	0
+ 1420 02f4 00        		.byte	0
+ 1421 02f5 80        		.byte	-128
+ 1422 02f6 80        		.byte	-128
+ 1423 02f7 E0        		.byte	-32
+ 1424 02f8 F0        		.byte	-16
+ 1425 02f9 FF        		.byte	-1
+ 1426 02fa FF        		.byte	-1
+ 1427 02fb FF        		.byte	-1
+ 1428 02fc FF        		.byte	-1
+ 1429 02fd FF        		.byte	-1
+ 1430 02fe FF        		.byte	-1
+ 1431 02ff FF        		.byte	-1
+ 1432 0300 FF        		.byte	-1
+ 1433 0301 FF        		.byte	-1
+ 1434 0302 FF        		.byte	-1
+ 1435 0303 FF        		.byte	-1
+ 1436 0304 FF        		.byte	-1
+ 1437 0305 FF        		.byte	-1
+ 1438 0306 FF        		.byte	-1
+ 1439 0307 FF        		.byte	-1
+ 1440 0308 7F        		.byte	127
+ 1441 0309 7F        		.byte	127
+ 1442 030a 7F        		.byte	127
+ 1443 030b 7F        		.byte	127
+ 1444 030c FF        		.byte	-1
+ 1445 030d F0        		.byte	-16
+ 1446 030e C0        		.byte	-64
+ 1447 030f 80        		.byte	-128
+ 1448 0310 80        		.byte	-128
+ 1449 0311 80        		.byte	-128
+ 1450 0312 00        		.byte	0
+ 1451 0313 00        		.byte	0
+ 1452 0314 FF        		.byte	-1
+ 1453 0315 FF        		.byte	-1
+ 1454 0316 FF        		.byte	-1
+ 1455 0317 FF        		.byte	-1
+ 1456 0318 FF        		.byte	-1
+ 1457 0319 FF        		.byte	-1
+ 1458 031a FF        		.byte	-1
+ 1459 031b FF        		.byte	-1
+ 1460 031c FF        		.byte	-1
+ 1461 031d FF        		.byte	-1
+ 1462 031e FE        		.byte	-2
+ 1463 031f FC        		.byte	-4
+ 1464 0320 F8        		.byte	-8
+ 1465 0321 F0        		.byte	-16
+ 1466 0322 E0        		.byte	-32
+ 1467 0323 E0        		.byte	-32
+ 1468 0324 C0        		.byte	-64
+ 1469 0325 C0        		.byte	-64
+ 1470 0326 80        		.byte	-128
+ 1471 0327 80        		.byte	-128
+ 1472 0328 80        		.byte	-128
+ 1473 0329 81        		.byte	-127
+ 1474 032a 01        		.byte	1
+ 1475 032b 01        		.byte	1
+ 1476 032c 01        		.byte	1
+ 1477 032d 01        		.byte	1
+ 1478 032e 01        		.byte	1
+ 1479 032f 01        		.byte	1
+ 1480 0330 00        		.byte	0
+ 1481 0331 80        		.byte	-128
+ 1482 0332 80        		.byte	-128
+ 1483 0333 C0        		.byte	-64
+ 1484 0334 C0        		.byte	-64
+ 1485 0335 E0        		.byte	-32
+ 1486 0336 E0        		.byte	-32
+ 1487 0337 70        		.byte	112
+ 1488 0338 78        		.byte	120
+ 1489 0339 3C        		.byte	60
+ 1490 033a 3E        		.byte	62
+ 1491 033b 3F        		.byte	63
+ 1492 033c 1F        		.byte	31
+ 1493 033d 1F        		.byte	31
+ 1494 033e 1F        		.byte	31
+ 1495 033f 3F        		.byte	63
+ 1496 0340 3F        		.byte	63
+ 1497 0341 7F        		.byte	127
+ 1498 0342 7F        		.byte	127
+ 1499 0343 FF        		.byte	-1
+ 1500 0344 FF        		.byte	-1
+ 1501 0345 FF        		.byte	-1
+ 1502 0346 FF        		.byte	-1
+ 1503 0347 FF        		.byte	-1
+ 1504 0348 FE        		.byte	-2
+ 1505 0349 F8        		.byte	-8
+ 1506 034a F0        		.byte	-16
+ 1507 034b F0        		.byte	-16
+ 1508 034c E0        		.byte	-32
+ 1509 034d C0        		.byte	-64
+ 1510 034e C0        		.byte	-64
+ 1511 034f 80        		.byte	-128
+ 1512 0350 80        		.byte	-128
+ 1513 0351 80        		.byte	-128
+ 1514 0352 01        		.byte	1
+ 1515 0353 03        		.byte	3
+ 1516 0354 03        		.byte	3
+ 1517 0355 03        		.byte	3
+ 1518 0356 03        		.byte	3
+ 1519 0357 03        		.byte	3
+ 1520 0358 03        		.byte	3
+ 1521 0359 01        		.byte	1
+ 1522 035a 01        		.byte	1
+ 1523 035b 01        		.byte	1
+ 1524 035c 00        		.byte	0
+ 1525 035d 00        		.byte	0
+ 1526 035e 00        		.byte	0
+ 1527 035f 00        		.byte	0
+ 1528 0360 00        		.byte	0
+ 1529 0361 00        		.byte	0
+ 1530 0362 00        		.byte	0
+ 1531 0363 00        		.byte	0
+ 1532 0364 00        		.byte	0
+ 1533 0365 00        		.byte	0
+ 1534 0366 00        		.byte	0
+ 1535 0367 00        		.byte	0
+ 1536 0368 00        		.byte	0
+ 1537 0369 00        		.byte	0
+ 1538 036a 00        		.byte	0
+ 1539 036b 00        		.byte	0
+ 1540 036c 00        		.byte	0
+ 1541 036d 00        		.byte	0
+ 1542 036e 00        		.byte	0
+ 1543 036f 03        		.byte	3
+ 1544 0370 03        		.byte	3
+ 1545 0371 03        		.byte	3
+ 1546 0372 03        		.byte	3
+ 1547 0373 03        		.byte	3
+ 1548 0374 03        		.byte	3
+ 1549 0375 03        		.byte	3
+ 1550 0376 03        		.byte	3
+ 1551 0377 03        		.byte	3
+ 1552 0378 03        		.byte	3
+ 1553 0379 03        		.byte	3
+ 1554 037a 03        		.byte	3
+ 1555 037b 03        		.byte	3
+ 1556 037c 03        		.byte	3
+ 1557 037d 01        		.byte	1
+ 1558 037e 01        		.byte	1
+ 1559 037f 01        		.byte	1
+ 1560 0380 01        		.byte	1
+ 1561 0381 00        		.byte	0
+ 1562 0382 00        		.byte	0
+ 1563 0383 00        		.byte	0
+ 1564 0384 00        		.byte	0
+ 1565 0385 00        		.byte	0
+ 1566 0386 00        		.byte	0
+ 1567 0387 00        		.byte	0
+ 1568 0388 00        		.byte	0
+ 1569 0389 00        		.byte	0
+ 1570 038a 00        		.byte	0
+ 1571 038b 01        		.byte	1
+ 1572 038c 01        		.byte	1
+ 1573 038d 01        		.byte	1
+ 1574 038e 01        		.byte	1
+ 1575 038f 01        		.byte	1
+ 1576 0390 03        		.byte	3
+ 1577 0391 03        		.byte	3
+ 1578 0392 03        		.byte	3
+ 1579 0393 03        		.byte	3
+ 1580 0394 03        		.byte	3
+ 1581 0395 03        		.byte	3
+ 1582 0396 03        		.byte	3
+ 1583 0397 03        		.byte	3
+ 1584 0398 03        		.byte	3
+ 1585 0399 03        		.byte	3
+ 1586 039a 03        		.byte	3
+ 1587 039b 03        		.byte	3
+ 1588 039c 03        		.byte	3
+ 1589 039d 03        		.byte	3
+ 1590 039e 03        		.byte	3
+ 1591 039f 03        		.byte	3
+ 1592 03a0 03        		.byte	3
+ 1593 03a1 03        		.byte	3
+ 1594 03a2 03        		.byte	3
+ 1595 03a3 03        		.byte	3
+ 1596 03a4 03        		.byte	3
+ 1597 03a5 03        		.byte	3
+ 1598 03a6 03        		.byte	3
+ 1599 03a7 03        		.byte	3
+ 1600 03a8 03        		.byte	3
+ 1601 03a9 03        		.byte	3
+ 1602 03aa 03        		.byte	3
+ 1603 03ab 03        		.byte	3
+ 1604 03ac 01        		.byte	1
+ 1605 03ad 01        		.byte	1
+ 1606 03ae 01        		.byte	1
+ 1607 03af 01        		.byte	1
+ 1608 03b0 01        		.byte	1
+ 1609 03b1 00        		.byte	0
+ 1610 03b2 00        		.byte	0
+ 1611 03b3 00        		.byte	0
+ 1612 03b4 00        		.byte	0
+ 1613 03b5 00        		.byte	0
+ 1614 03b6 00        		.byte	0
+ 1615 03b7 00        		.byte	0
+ 1616 03b8 00        		.byte	0
+ 1617 03b9 00        		.byte	0
+ 1618 03ba 00        		.byte	0
+ 1619 03bb 00        		.byte	0
+ 1620 03bc 00        		.byte	0
+ 1621 03bd 00        		.byte	0
+ 1622 03be 00        		.byte	0
+ 1623 03bf 00        		.byte	0
+ 1624 03c0 00        		.byte	0
+ 1625 03c1 00        		.byte	0
+ 1626 03c2 01        		.byte	1
+ 1627 03c3 01        		.byte	1
+ 1628 03c4 01        		.byte	1
+ 1629 03c5 01        		.byte	1
+ 1630 03c6 03        		.byte	3
+ 1631 03c7 03        		.byte	3
+ 1632 03c8 03        		.byte	3
+ 1633 03c9 03        		.byte	3
+ 1634 03ca 03        		.byte	3
+ 1635 03cb 03        		.byte	3
+ 1636 03cc 03        		.byte	3
+ 1637 03cd 03        		.byte	3
+ 1638 03ce 03        		.byte	3
+ 1639 03cf 03        		.byte	3
+ 1640 03d0 03        		.byte	3
+ 1641 03d1 01        		.byte	1
+ 1642 03d2 01        		.byte	1
+ 1643 03d3 01        		.byte	1
+ 1644 03d4 01        		.byte	1
+ 1645 03d5 00        		.byte	0
+ 1646 03d6 00        		.byte	0
+ 1647 03d7 00        		.byte	0
+ 1648 03d8 00        		.byte	0
+ 1649 03d9 00        		.byte	0
+ 1650 03da 00        		.byte	0
+ 1651 03db 00        		.byte	0
+ 1652 03dc 00        		.byte	0
+ 1653 03dd 00        		.byte	0
+ 1654 03de 00        		.byte	0
+ 1655 03df 00        		.byte	0
+ 1656 03e0 00        		.byte	0
+ 1657 03e1 00        		.byte	0
+ 1658 03e2 00        		.byte	0
+ 1659 03e3 00        		.byte	0
+ 1660 03e4 00        		.byte	0
+ 1661 03e5 00        		.byte	0
+ 1662 03e6 00        		.byte	0
+ 1663 03e7 00        		.byte	0
+ 1664               		.text
+ 1665               	.Letext0:
+ 1666               		.file 3 "/usr/local/Cellar/avr-gcc/4.9.2/avr/include/stdint.h"
+ 1667               		.file 4 "logo.h"
+ 1668               		.file 5 "lib/ADC/ADC.h"
+ 1669               		.file 6 "<built-in>"
+ 1670               		.file 7 "lib/ssd1306xled/ssd1306xled.h"
+ 1671               		.file 8 "lib/ssd1306xled/ssd1306xled8x16.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:2      *ABS*:000000000000003e __SP_H__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:3      *ABS*:000000000000003d __SP_L__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:4      *ABS*:000000000000003f __SREG__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:5      *ABS*:0000000000000000 __tmp_reg__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:6      *ABS*:0000000000000001 __zero_reg__
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:15     .text:0000000000000000 measureCurrent
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:657    .bss:0000000000000000 currentMode
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:171    .text:00000000000000aa measureVoltage
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:220    .text:00000000000000d2 cleanLine
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:301    .text.startup:0000000000000000 main
+/var/folders/ct/_b0xx7k52l9dgpb8n2_js71w0000gn/T//ccHcUrUv.s:663    .progmem.data:0000000000000000 logo
+                             .bss:0000000000000001 buttonPressed.1872
+
+UNDEFINED SYMBOLS
+__floatunsisf
+__mulsf3
+__divsf3
+AdcSetDifferentialInputMode
+AdcGetMultiSample
+__fixunssfsi
+AdcSetSingleEndedMode
+ssd1306_setpos
+ssd1306_string_font6x8
+__ltsf2
+__gtsf2
+__fixsfsi
+AdcInit
+ssd1306_init
+ssd1306_fill
+ssd1306_draw_bmp
+ssd1306_flip
+itoa
+ssd1306_char_f8x16
+__do_copy_data
+__do_clear_bss

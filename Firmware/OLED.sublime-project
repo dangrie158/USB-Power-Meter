@@ -1,0 +1,10 @@
+{
+	"folders":
+	[
+		{
+			"path": "OLED",
+			"folder_exclude_patterns": [".dep", ".git"],
+        	"file_exclude_patterns": ["*.map", "*.sym", "*.eep", "*.elf", "*.lst", "*.hex", "*.lss"]
+		}
+	]
+}
